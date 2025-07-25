@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Lista de Tarefas - JM Analytics</title>
+    <!-- Link para a fonte Inter do Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Variáveis CSS para um tema consistente, alinhado com JM Analytics */
+        :root {
+            --primary-color: #2C7A7B; /* Verde-azulado */
+            --secondary-color: #2D3748; /* Cinza-azulado escuro */
+            --accent-color: #ECC94B; /* Amarelo-dourado */
+            --background-color: #F7FAFC; /* Branco-gelo */
+            --surface-color: #FFFFFF; /* Branco puro */
+            --text-color: #4A5568; /* Cinza escuro */
+            --border-color: #CBD5E0; /* Cinza claro para bordas */
+            --success-color: #48BB78; /* Verde sucesso */
+            --danger-color: #F56565; /* Vermelho perigo */
+        }
+
+        /* Estilos Globais e Reset Básico */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center; /* Centraliza horizontalmente */
+            align-items: flex-start; /* Alinha ao topo verticalmente */
+            min-height: 100vh; /* Ocupa a altura total da viewport */
+            padding-top: 50px; /* Adiciona um padding no topo para não ficar colado */
+            box-sizing: border-box;
+        }
+
+        /* Contêiner Principal da Aplicação */
+        .container {
+            background-color: var(--surface-color);
+            border-radius: 12px; /* Cantos arredondados para todos os elementos */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            width: 100%;
+            max-width: 500px; /* Largura máxima para a lista */
+            margin: 20px; /* Margem para telas menores */
+        }
+
+        /* Cabeçalho */
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
+            font-size: 2em;
+        }
+
+        /* Seção de Adicionar Tarefa */
+        .add-task-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .add-task-section input[type="text"] {
+            flex-grow: 1; /* Ocupa o espaço disponível */
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px; /* Cantos arredondados */
+            font-size: 1em;
+            color: var(--text-color);
+            outline: none; /* Remove o outline padrão */
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .add-task-section input[type="text"]:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(44, 122, 123, 0.2); /* Sombra ao focar */
+        }
+
+        .add-task-section button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px; /* Cantos arredondados */
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-task-section button:hover {
+            background-color: #246B6C; /* Tom mais escuro ao hover */
+            transform: translateY(-2px); /* Efeito de "subir" */
+        }
+
+        .add-task-section button:active {
+            transform: translateY(0); /* Efeito de "clique" */
+        }
+
+        /* Lista de Tarefas */
+        .task-list {
+            list-style: none; /* Remove os marcadores de lista */
+            padding: 0;
+            margin: 0;
+        }
+
+        .task-list li {
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px; /* Cantos arredondados */
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 1em;
+            transition: background-color 0.2s ease;
+        }
+
+        .task-list li:last-child {
+            margin-bottom: 0; /* Remove margem do último item */
+        }
+
+        .task-list li.completed {
+            background-color: #D6FAE6; /* Fundo verde claro para tarefas concluídas */
+            color: var(--success-color);
+            text-decoration: line-through; /* Risca o texto */
+            opacity: 0.7;
+        }
+
+        .task-text {
+            flex-grow: 1;
+            margin-right: 15px;
+            word-break: break-word; /* Quebra palavras longas */
+        }
+
+        /* Botões de Ação da Tarefa (Concluir/Remover) */
+        .task-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .task-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 5px;
+            border-radius: 50%; /* Botões redondos */
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            display: flex; /* Para centralizar o ícone */
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-actions .complete-btn {
+            color: var(--success-color);
+        }
+
+        .task-actions .complete-btn:hover {
+            background-color: rgba(72, 187, 120, 0.2); /* Verde transparente ao hover */
+        }
+
+        .task-actions .delete-btn {
+            color: var(--danger-color);
+        }
+
+        .task-actions .delete-btn:hover {
+            background-color: rgba(245, 101, 101, 0.2); /* Vermelho transparente ao hover */
+        }
+
+        /* Responsividade Básica */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 20px;
+            }
+
+            .add-task-section {
+                flex-direction: column; /* Pilha de input e botão em telas pequenas */
+            }
+
+            .add-task-section button {
+                width: 100%; /* Botão ocupa toda a largura */
+                margin-top: 10px;
+            }
+
+            .task-list li {
+                flex-direction: column; /* Pilha de texto e botões em telas pequenas */
+                align-items: flex-start;
+                padding: 15px;
+            }
+
+            .task-text {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .task-actions {
+                width: 100%;
+                justify-content: flex-end; /* Alinha botões à direita */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Minhas Tarefas JM Analytics</h1>
+
+        <div class="add-task-section">
+            <input type="text" id="newTaskInput" placeholder="Adicionar nova tarefa...">
+            <button id="addTaskBtn">Adicionar</button>
+        </div>
+
+        <ul id="taskList" class="task-list">
+            <!-- Tarefas serão adicionadas aqui via JavaScript -->
+        </ul>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Referências aos elementos do DOM
+            const newTaskInput = document.getElementById('newTaskInput');
+            const addTaskBtn = document.getElementById('addTaskBtn');
+            const taskList = document.getElementById('taskList');
+
+            // Array para armazenar as tarefas (simula um banco de dados simples)
+            // Cada tarefa é um objeto { text: "...", completed: false }
+            let tasks = [];
+
+            // Função para renderizar as tarefas na tela
+            function renderTasks() {
+                taskList.innerHTML = ''; // Limpa a lista existente para redesenhar
+
+                if (tasks.length === 0) {
+                    // Adiciona uma mensagem se não houver tarefas
+                    const noTasksMessage = document.createElement('li');
+                    noTasksMessage.textContent = "Nenhuma tarefa adicionada ainda. Adicione uma!";
+                    noTasksMessage.style.textAlign = "center";
+                    noTasksMessage.style.fontStyle = "italic";
+                    noTasksMessage.style.color = "var(--text-color)";
+                    noTasksMessage.style.backgroundColor = "transparent";
+                    noTasksMessage.style.border = "none";
+                    taskList.appendChild(noTasksMessage);
+                    return;
+                }
+
+                tasks.forEach((task, index) => {
+                    const listItem = document.createElement('li');
+                    // Adiciona a classe 'completed' se a tarefa estiver concluída
+                    if (task.completed) {
+                        listItem.classList.add('completed');
+                    }
+
+                    listItem.innerHTML = `
+                        <span class="task-text">${task.text}</span>
+                        <div class="task-actions">
+                            <button class="complete-btn" data-index="${index}" title="Marcar como Concluído">✔️</button>
+                            <button class="delete-btn" data-index="${index}" title="Excluir Tarefa">❌</button>
+                        </div>
+                    `;
+                    taskList.appendChild(listItem);
+                });
+            }
+
+            // Função para adicionar uma nova tarefa
+            function addTask() {
+                const taskText = newTaskInput.value.trim(); // Pega o texto e remove espaços em branco
+
+                if (taskText !== '') { // Verifica se o campo não está vazio
+                    tasks.push({ text: taskText, completed: false }); // Adiciona a nova tarefa ao array
+                    newTaskInput.value = ''; // Limpa o input
+                    renderTasks(); // Redesenha a lista
+                } else {
+                    alert('Por favor, digite uma tarefa!'); // Usa alert() como substituto temporário para feedback visual
+                }
+            }
+
+            // Função para marcar uma tarefa como concluída/pendente
+            function toggleComplete(index) {
+                tasks[index].completed = !tasks[index].completed; // Inverte o status de completed
+                renderTasks(); // Redesenha a lista
+            }
+
+            // Função para remover uma tarefa
+            function deleteTask(index) {
+                // Confirmação simples para deletar
+                if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
+                    tasks.splice(index, 1); // Remove a tarefa do array
+                    renderTasks(); // Redesenha a lista
+                }
+            }
+
+            // --- Event Listeners ---
+
+            // Botão "Adicionar"
+            addTaskBtn.addEventListener('click', addTask);
+
+            // Adicionar tarefa ao pressionar "Enter" no campo de input
+            newTaskInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    addTask();
+                }
+            });
+
+            // Gerenciamento de cliques na lista de tarefas (delegation)
+            taskList.addEventListener('click', (event) => {
+                const target = event.target; // Elemento que foi clicado
+
+                if (target.classList.contains('complete-btn')) {
+                    const index = parseInt(target.dataset.index); // Pega o índice do atributo data-index
+                    toggleComplete(index);
+                } else if (target.classList.contains('delete-btn')) {
+                    const index = parseInt(target.dataset.index);
+                    deleteTask(index);
+                }
+            });
+
+            // Renderiza as tarefas iniciais (se houver) ao carregar a página
+            renderTasks();
+        });
+    </script>
+</body>
+</html>
