@@ -3,30 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minha Lista de Tarefas - JM Analytics</title>
-    <!-- Link para a fonte Inter do Google Fonts -->
+    <title>Relógio Inteligente de Estudos</title>
+    <!-- Link para a fonte Inter do Google Fonts para uma tipografia moderna e legível -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Link para ícones Phosphor Icons para botões e elementos visuais -->
+    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
     <style>
-        /* Variáveis CSS para um tema consistente, alinhado com JM Analytics */
+        /*
+         * Seção: Variáveis de Design e Estilos Globais
+         * Descrição: Paleta de cores preto e dourado com efeitos de néon.
+         */
         :root {
-            --primary-color: #2C7A7B; /* Verde-azulado */
-            --secondary-color: #2D3748; /* Cinza-azulado escuro */
-            --accent-color: #ECC94B; /* Amarelo-dourado */
-            --background-color: #F7FAFC; /* Branco-gelo */
-            --surface-color: #FFFFFF; /* Branco puro */
-            --text-color: #4A5568; /* Cinza escuro */
-            --border-color: #CBD5E0; /* Cinza claro para bordas */
-            --success-color: #48BB78; /* Verde sucesso */
-            --danger-color: #F56565; /* Vermelho perigo */
-            --info-color: #63B3ED; /* Azul claro para informações */
-            --priority-low: #68D391; /* Verde para prioridade baixa */
-            --priority-medium: #F6AD55; /* Laranja para prioridade média */
-            --priority-high: #E53E3E; /* Vermelho para prioridade alta */
+            --primary-color: #FFD700; /* Dourado: Ação, Foco, Recompensa */
+            --primary-color-hover: #E5C100;
+            --secondary-color: #BDB76B; /* Dourado suave para textos */
+            --background-color: #0A0A0A; /* Preto profundo para o fundo */
+            --surface-color: #1A1A1A; /* Cinza escuro para cards e elementos principais */
+            --text-color: #F0F0F0; /* Branco-sujo para legibilidade */
+            --border-color: #444444; /* Cinza escuro para bordas sutis */
+            --success-color: #2ECC71; /* Verde: Sucesso */
+            --danger-color: #FF6347; /* Vermelho: Ações destrutivas */
+            --info-color: #3498DB; /* Azul: Informação */
+            --priority-low: #34A853; /* Verde para prioridade baixa */
+            --priority-medium: #F9A825; /* Amarelo para prioridade média */
+            --priority-high: #EA4335; /* Vermelho para prioridade alta */
+            --neon-shadow: 0 0 5px rgba(255, 215, 0, 0.6);
         }
 
-        /* Estilos Globais e Reset Básico */
+        /* Estilos base e reset para uma experiência limpa e escura */
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--background-color);
@@ -34,85 +40,247 @@
             margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center; /* Centraliza horizontalmente */
-            align-items: flex-start; /* Alinha ao topo verticalmente */
-            min-height: 100vh; /* Ocupa a altura total da viewport */
-            padding-top: 50px; /* Adiciona um padding no topo para não ficar colado */
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 50px 20px;
             box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Estilo para o efeito de nuvens em cascata */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.05) 0%,
+                rgba(255, 255, 255, 0.03) 25%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.01) 75%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            background-size: 100% 200%;
+            animation: cascade-clouds 30s linear infinite;
+            z-index: 0;
+            opacity: 0.2;
         }
 
-        /* Contêiner Principal da Aplicação */
+        @keyframes cascade-clouds {
+            from {
+                background-position: 0 0;
+            }
+            to {
+                background-position: 0 200%;
+            }
+        }
+
         .container {
             background-color: var(--surface-color);
-            border-radius: 12px; /* Cantos arredondados para todos os elementos */
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
             padding: 30px;
             width: 100%;
-            max-width: 600px; /* Largura máxima para a lista */
-            margin: 20px; /* Margem para telas menores */
-            position: relative; /* Para o modal */
+            max-width: 600px;
+            position: relative;
+            z-index: 1;
         }
 
-        /* Cabeçalho */
         h1 {
             color: var(--primary-color);
             text-align: center;
             margin-bottom: 30px;
             font-weight: 700;
-            font-size: 2.2em;
+            font-size: 2em;
+            text-shadow: var(--neon-shadow);
         }
 
-        /* Seção de Adicionar Tarefa */
+        .user-info {
+            text-align: center;
+            font-size: 0.8em;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+        
+        /*
+         * Seção: Estilos do Timer
+         * Descrição: Contém os estilos para a interface do timer Pomodoro.
+         */
+        .pomodoro-timer {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: var(--background-color);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .pomodoro-timer h3 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 5px;
+            text-shadow: 0 0 3px var(--primary-color);
+        }
+        
+        .pomodoro-timer p {
+            font-size: 0.9em;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .timer-display {
+            font-size: 3em;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            font-variant-numeric: tabular-nums;
+            text-shadow: var(--neon-shadow);
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .timer-controls button {
+            background-color: var(--primary-color);
+            color: #1A1A1A;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 5px var(--primary-color);
+        }
+
+        .timer-controls button:hover {
+            background-color: var(--primary-color-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 0 8px var(--primary-color), 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .timer-controls button:active {
+            transform: translateY(0);
+            box-shadow: 0 0 5px var(--primary-color);
+        }
+        
+        .timer-config {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .timer-config label {
+            font-size: 0.9em;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .timer-config input {
+            width: 45px;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 0.9em;
+            background-color: var(--surface-color);
+            color: var(--text-color);
+        }
+
+        /*
+         * Seção: Estilos da Lista de Tarefas
+         * Descrição: Estilos para adicionar, filtrar e visualizar as tarefas.
+         */
         .add-task-section {
             display: flex;
-            flex-wrap: wrap; /* Permite quebrar linha em telas menores */
+            flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 30px;
         }
 
         .add-task-section input[type="text"],
-        .add-task-section select {
-            flex-grow: 1; /* Ocupa o espaço disponível */
-            padding: 12px 15px;
+        .add-task-section select,
+        .add-task-section .time-input-group input {
+            flex-grow: 1;
+            padding: 12px;
             border: 1px solid var(--border-color);
-            border-radius: 8px; /* Cantos arredondados */
+            border-radius: 8px;
             font-size: 1em;
             color: var(--text-color);
-            outline: none; /* Remove o outline padrão */
+            outline: none;
+            background-color: var(--surface-color);
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         .add-task-section input[type="text"]:focus,
-        .add-task-section select:focus {
+        .add-task-section select:focus,
+        .add-task-section .time-input-group input:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(44, 122, 123, 0.2); /* Sombra ao focar */
+            box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.4);
+        }
+        
+        .add-task-section .time-input-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-grow: 1;
+        }
+        
+        .add-task-buttons {
+            display: flex;
+            flex-grow: 1;
+            gap: 10px;
         }
 
         .add-task-section button {
             background-color: var(--primary-color);
-            color: white;
+            color: #1A1A1A;
             padding: 12px 20px;
             border: none;
-            border-radius: 8px; /* Cantos arredondados */
+            border-radius: 8px;
             cursor: pointer;
             font-size: 1em;
             font-weight: 600;
-            transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            box-shadow: 0 0 5px var(--primary-color);
+        }
+        
+        .add-task-section .generate-btn {
+            background-color: var(--secondary-color);
+            color: #1A1A1A;
+            flex-grow: 1;
+            box-shadow: 0 0 5px var(--secondary-color);
         }
 
         .add-task-section button:hover {
-            background-color: #246B6C; /* Tom mais escuro ao hover */
-            transform: translateY(-2px); /* Efeito de "subir" */
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+            background-color: var(--primary-color-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 0 8px var(--primary-color), 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+        
+        .add-task-section .generate-btn:hover {
+            background-color: #A09E5F;
+            transform: translateY(-1px);
+            box-shadow: 0 0 8px var(--secondary-color), 0 0 15px rgba(189, 183, 107, 0.4);
         }
 
         .add-task-section button:active {
-            transform: translateY(0); /* Efeito de "clique" */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transform: translateY(0);
+            box-shadow: 0 0 5px var(--primary-color);
         }
 
-        /* Seção de Filtros e Pesquisa */
         .controls-section {
             display: flex;
             flex-wrap: wrap;
@@ -130,65 +298,69 @@
             font-size: 0.95em;
             color: var(--text-color);
             outline: none;
+            background-color: var(--surface-color);
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         .controls-section input[type="text"]:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(44, 122, 123, 0.2);
+            box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.4);
         }
 
         .filter-buttons button {
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 10px 15px;
-            border: none;
+            background-color: var(--surface-color);
+            color: var(--secondary-color);
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             cursor: pointer;
             font-size: 0.9em;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
         }
 
         .filter-buttons button:hover {
-            background-color: #4A5568;
+            background-color: #2A2A2A;
         }
 
         .filter-buttons button.active {
             background-color: var(--primary-color);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            color: var(--surface-color);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px var(--primary-color);
         }
 
-        /* Lista de Tarefas */
         .task-list {
-            list-style: none; /* Remove os marcadores de lista */
+            list-style: none;
             padding: 0;
             margin: 0;
         }
 
         .task-list li {
-            background-color: var(--background-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px; /* Cantos arredondados */
+            background-color: var(--surface-color);
+            border: none;
+            border-left: 4px solid var(--border-color);
+            border-radius: 8px;
             padding: 15px 20px;
             margin-bottom: 10px;
             display: flex;
-            flex-wrap: wrap; /* Permite quebrar linha */
+            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
             font-size: 1em;
             transition: background-color 0.2s ease, box-shadow 0.2s ease;
-            position: relative; /* Para o ícone de edição */
+            position: relative;
         }
-
-        .task-list li:last-child {
-            margin-bottom: 0; /* Remove margem do último item */
+        
+        .task-list li:hover {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 5px rgba(255, 215, 0, 0.2);
         }
-
+        
         .task-list li.completed {
-            background-color: #D6FAE6; /* Fundo verde claro para tarefas concluídas */
-            color: var(--success-color);
-            text-decoration: line-through; /* Risca o texto */
-            opacity: 0.7;
+            background-color: #2A2A2A;
+            border-left-color: var(--success-color);
+            color: #718096;
+            text-decoration: line-through;
+            opacity: 0.8;
         }
 
         .task-content {
@@ -196,23 +368,26 @@
             align-items: center;
             flex-grow: 1;
             margin-right: 15px;
-            min-width: 0; /* Permite que o texto encolha */
+            min-width: 0;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .task-text {
-            word-break: break-word; /* Quebra palavras longas */
-            cursor: pointer; /* Indica que é clicável para edição */
-            padding: 2px 5px; /* Para melhor área de clique e visual */
+            word-break: break-word;
+            cursor: pointer;
+            padding: 2px 5px;
             border-radius: 4px;
             transition: background-color 0.2s ease;
+            flex-grow: 1;
         }
 
         .task-text:hover:not(.editing) {
-            background-color: rgba(0, 0, 0, 0.05); /* Pequeno destaque ao passar o mouse */
+            background-color: rgba(255, 255, 255, 0.05);
         }
 
         .task-text.editing {
-            background-color: var(--surface-color);
+            background-color: var(--background-color);
             border: 1px solid var(--primary-color);
             padding: 1px 4px;
             outline: none;
@@ -223,110 +398,92 @@
             font-weight: 600;
             padding: 4px 8px;
             border-radius: 6px;
-            margin-left: 10px;
-            white-space: nowrap; /* Impede quebra de linha */
+            white-space: nowrap;
+            color: #1A1A1A;
         }
 
-        .priority-low {
-            background-color: var(--priority-low);
-            color: white;
+        .priority-low { background-color: var(--priority-low); }
+        .priority-medium { background-color: var(--priority-medium); }
+        .priority-high { background-color: var(--priority-high); }
+        
+        .expected-time {
+            font-size: 0.8em;
+            font-weight: 600;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background-color: var(--background-color);
+            padding: 4px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
         }
 
-        .priority-medium {
-            background-color: var(--priority-medium);
-            color: white;
-        }
-
-        .priority-high {
-            background-color: var(--priority-high);
-            color: white;
-        }
-
-        /* Botões de Ação da Tarefa (Concluir/Remover/Editar) */
         .task-actions {
             display: flex;
-            gap: 8px;
-            margin-top: 5px; /* Espaçamento em telas menores */
-        }
-
-        @media (min-width: 600px) {
-            .task-actions {
-                margin-top: 0; /* Remove espaçamento em telas maiores */
-            }
+            gap: 6px;
+            margin-top: 5px;
         }
 
         .task-actions button {
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 1.2em;
-            padding: 5px;
-            border-radius: 50%; /* Botões redondos */
+            font-size: 1em;
+            padding: 6px;
+            border-radius: 50%;
             transition: background-color 0.2s ease, transform 0.1s ease;
-            display: flex; /* Para centralizar o ícone */
+            display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: none; /* Remove sombra padrão do botão */
+            box-shadow: none;
+        }
+        
+        .task-actions button i {
+            pointer-events: none;
         }
 
-        .task-actions .complete-btn {
-            color: var(--success-color);
-        }
+        .task-actions .complete-btn { color: var(--success-color); }
+        .task-actions .complete-btn:hover { background-color: rgba(46, 204, 113, 0.2); }
+        .task-actions .edit-btn { color: var(--info-color); }
+        .task-actions .edit-btn:hover { background-color: rgba(52, 152, 219, 0.2); }
+        .task-actions .delete-btn { color: var(--danger-color); }
+        .task-actions .delete-btn:hover { background-color: rgba(255, 99, 71, 0.2); }
 
-        .task-actions .complete-btn:hover {
-            background-color: rgba(72, 187, 120, 0.2); /* Verde transparente ao hover */
-        }
-
-        .task-actions .edit-btn {
-            color: var(--info-color);
-        }
-
-        .task-actions .edit-btn:hover {
-            background-color: rgba(99, 179, 237, 0.2);
-        }
-
-        .task-actions .delete-btn {
-            color: var(--danger-color);
-        }
-
-        .task-actions .delete-btn:hover {
-            background-color: rgba(245, 101, 101, 0.2); /* Vermelho transparente ao hover */
-        }
-
-        /* Seção de Ações em Massa */
         .bulk-actions {
             display: flex;
-            justify-content: flex-end; /* Alinha à direita */
+            justify-content: flex-end;
             margin-top: 20px;
         }
 
         .bulk-actions button {
             background-color: var(--danger-color);
-            color: white;
+            color: #1A1A1A;
             padding: 10px 15px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
             font-size: 0.9em;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-weight: 600;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 5px var(--danger-color);
         }
 
         .bulk-actions button:hover {
-            background-color: #C53030;
+            background-color: #D34C38;
             transform: translateY(-1px);
+            box-shadow: 0 0 10px var(--danger-color);
         }
 
-        /* Mensagem de erro/feedback */
         .feedback-message {
             color: var(--danger-color);
             font-size: 0.9em;
             margin-top: 5px;
             text-align: center;
-            visibility: hidden; /* Começa invisível */
+            visibility: hidden;
             opacity: 0;
             transition: opacity 0.3s ease, visibility 0.3s ease;
-            min-height: 20px; /* Para evitar CLS */
+            min-height: 20px;
         }
 
         .feedback-message.show {
@@ -337,15 +494,18 @@
         .feedback-message.success {
             color: var(--success-color);
         }
-
-        /* Modal Customizado */
+        
+        /*
+         * Seção: Estilos do Modal (Alerts e Confirmações)
+         * Descrição: Estilos para o modal personalizado.
+         */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.7);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -354,7 +514,7 @@
             opacity: 0;
             transition: opacity 0.3s ease, visibility 0.3s ease;
         }
-
+        
         .modal-overlay.show {
             visibility: visible;
             opacity: 1;
@@ -364,12 +524,13 @@
             background-color: var(--surface-color);
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 215, 0, 0.3);
             text-align: center;
             max-width: 400px;
             width: 90%;
             transform: translateY(-20px);
             transition: transform 0.3s ease;
+            border: 1px solid var(--primary-color);
         }
 
         .modal-overlay.show .modal-content {
@@ -377,17 +538,18 @@
         }
 
         .modal-content h3 {
-            color: var(--secondary-color);
+            color: var(--primary-color);
             margin-bottom: 20px;
             font-size: 1.5em;
+            text-shadow: 0 0 5px var(--primary-color);
         }
-
+        
         .modal-content p {
             margin-bottom: 30px;
-            color: var(--text-color);
+            color: var(--secondary-color);
             font-size: 1.1em;
         }
-
+        
         .modal-buttons {
             display: flex;
             justify-content: center;
@@ -401,15 +563,15 @@
             cursor: pointer;
             font-size: 1em;
             font-weight: 600;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            box-shadow: 0 0 5px var(--border-color);
         }
 
         .modal-buttons .modal-confirm-btn {
             background-color: var(--danger-color);
-            color: white;
+            color: var(--background-color);
         }
-
+        
         .modal-buttons .modal-confirm-btn:hover {
             background-color: #C53030;
             transform: translateY(-1px);
@@ -419,31 +581,174 @@
             background-color: var(--border-color);
             color: var(--text-color);
         }
-
+        
         .modal-buttons .modal-cancel-btn:hover {
-            background-color: #A0AEC0;
+            background-color: #888;
             transform: translateY(-1px);
         }
+        
+        .generated-tasks-list {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        
+        .generated-tasks-list li {
+            background-color: var(--background-color);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-        /* Seção de Frase Motivacional */
-        .motivational-quote {
+        /*
+         * Seção: Estilos do Histórico de Estudos
+         * Descrição: Estilos para a seção que armazena as sessões concluídas.
+         */
+        .history-section {
+            margin-top: 40px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .history-section h2 {
+            text-align: center;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .history-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .history-list li {
+            background-color: var(--surface-color);
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95em;
+            box-shadow: none;
+            border-left: 4px solid;
+            transition: background-color 0.2s ease;
+        }
+        
+        .history-list li:hover {
+            background-color: #2A2A2A;
+        }
+
+        .history-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .history-list .history-study {
+            border-left-color: var(--primary-color);
+        }
+
+        .history-list .history-break {
+            border-left-color: var(--info-color);
+        }
+
+        .history-list .history-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /*
+         * Seção: Estilos do Rodapé e Link do LinkedIn
+         * Descrição: Estilos para a frase motivacional e o link de perfil.
+         */
+        .footer-container {
             text-align: center;
             margin-top: 40px;
+        }
+
+        .motivational-quote {
             padding: 20px;
-            background-color: var(--primary-color);
-            color: white;
+            background-color: var(--background-color);
+            color: var(--secondary-color);
             border-radius: 12px;
             font-style: italic;
-            font-size: 1.1em;
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            font-size: 1em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            position: relative;
+            border: 1px solid var(--border-color);
         }
 
         .motivational-quote p {
             margin: 0;
             line-height: 1.5;
         }
+        
+        .motivational-quote .generate-quote-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-radius: 50%;
+            padding: 5px;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            box-shadow: 0 0 3px var(--primary-color);
+        }
+        
+        .motivational-quote .generate-quote-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .linkedin-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .linkedin-link:hover {
+            background-color: var(--surface-color);
+            box-shadow: 0 0 8px var(--primary-color), 0 0 15px rgba(255, 215, 0, 0.4);
+        }
 
-        /* Responsividade */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 30px;
+            height: 30px;
+            -webkit-animation: spin 2s linear infinite;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+        }
+
+        @-webkit-keyframes spin {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /*
+         * Seção: Responsividade
+         * Descrição: Ajusta o layout para diferentes tamanhos de tela.
+         */
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -461,8 +766,13 @@
 
             .add-task-section input[type="text"],
             .add-task-section select,
-            .add-task-section button {
+            .add-task-section button,
+            .add-task-section .time-input-group {
                 width: 100%;
+            }
+            
+            .add-task-buttons {
+                flex-direction: column;
             }
 
             .controls-section {
@@ -504,42 +814,101 @@
 </head>
 <body>
     <div class="container">
-        <h1>Minhas Tarefas JM Analytics</h1>
+        <h1>Relógio Inteligente de Estudos</h1>
+        <div id="userInfo" class="user-info">Aguardando autenticação...</div>
 
-        <div class="add-task-section">
-            <input type="text" id="newTaskInput" placeholder="Adicionar nova tarefa...">
-            <select id="prioritySelect">
-                <option value="Baixa">Prioridade: Baixa</option>
-                <option value="Média">Prioridade: Média</option>
-                <option value="Alta">Prioridade: Alta</option>
-            </select>
-            <button id="addTaskBtn">Adicionar</button>
-            <p id="feedbackMessage" class="feedback-message"></p>
-        </div>
-
-        <div class="controls-section">
-            <input type="text" id="searchInput" placeholder="Pesquisar tarefas...">
-            <div class="filter-buttons">
-                <button id="filterAllBtn" class="active">Todas</button>
-                <button id="filterPendingBtn">Pendentes</button>
-                <button id="filterCompletedBtn">Concluídas</button>
+        <!-- Seção do Timer (Pomodoro) -->
+        <div class="pomodoro-timer">
+            <h3>Defina Metas de Tempo Claras!</h3>
+            <p>Conquiste grandes resultados com sessões de foco e pausas estratégicas.</p>
+            <div class="timer-config">
+                <label for="studyTime">Estudo (min):</label>
+                <input type="number" id="studyTimeInput" value="25" min="1" max="90">
+                <label for="breakTime">Descanso (min):</label>
+                <input type="number" id="breakTimeInput" value="5" min="1" max="30">
+            </div>
+            <div id="timerDisplay" class="timer-display">25:00</div>
+            <div class="timer-controls">
+                <button id="startTimerBtn">
+                    <i class="ph ph-play-circle" style="font-size: 1.2em;"></i> Iniciar
+                </button>
+                <button id="pauseTimerBtn" style="display: none;">
+                    <i class="ph ph-pause-circle" style="font-size: 1.2em;"></i> Pausar
+                </button>
+                <button id="resetTimerBtn">
+                    <i class="ph ph-arrow-counter-clockwise" style="font-size: 1.2em;"></i> Resetar
+                </button>
             </div>
         </div>
+        
+        <!-- Loader para indicar que os dados estão sendo carregados -->
+        <div id="loader" class="loader" style="display: block;"></div>
+        
+        <div id="mainContent" style="display: none;">
+            <!-- Seção para Adicionar Novas Tarefas -->
+            <div class="add-task-section">
+                <input type="text" id="newTaskInput" placeholder="Adicionar nova tarefa...">
+                <select id="prioritySelect">
+                    <option value="Baixa">Prioridade: Baixa</option>
+                    <option value="Média">Prioridade: Média</option>
+                    <option value="Alta">Prioridade: Alta</option>
+                </select>
+                <div class="time-input-group">
+                    <label for="expectedTimeInput">Tempo (min):</label>
+                    <input type="number" id="expectedTimeInput" value="30" min="1" max="180">
+                </div>
+                <div class="add-task-buttons">
+                    <button id="addTaskBtn">Adicionar</button>
+                    <button id="generateTasksBtn" class="generate-btn">Gerar Tarefas ✨</button>
+                </div>
+                <p id="feedbackMessage" class="feedback-message"></p>
+            </div>
 
-        <ul id="taskList" class="task-list">
-            <!-- Tarefas serão adicionadas aqui via JavaScript -->
-        </ul>
+            <!-- Seção de Filtros e Pesquisa -->
+            <div class="controls-section">
+                <input type="text" id="searchInput" placeholder="Pesquisar tarefas...">
+                <div class="filter-buttons">
+                    <button id="filterAllBtn" class="active">Todas</button>
+                    <button id="filterPendingBtn">Pendentes</button>
+                    <button id="filterCompletedBtn">Concluídas</button>
+                </div>
+            </div>
 
-        <div class="bulk-actions">
-            <button id="clearCompletedBtn">Limpar Concluídas</button>
+            <!-- Lista de Tarefas Pendentes e Concluídas -->
+            <ul id="taskList" class="task-list">
+                <!-- Tarefas serão adicionadas aqui via JavaScript -->
+            </ul>
+
+            <!-- Ações em Massa (Ex: Limpar tarefas concluídas) -->
+            <div class="bulk-actions">
+                <button id="clearCompletedBtn">Limpar Concluídas</button>
+            </div>
+
+            <!-- Seção de Histórico de Estudos -->
+            <div class="history-section">
+                <h2>Histórico de Sessões</h2>
+                <ul id="historyList" class="history-list">
+                    <!-- Sessões concluídas serão adicionadas aqui via JavaScript -->
+                </ul>
+            </div>
         </div>
-
-        <div class="motivational-quote">
-            <p id="quoteText"></p>
+        
+        <!-- Rodapé com Frase Motivacional e Link do LinkedIn -->
+        <div class="footer-container">
+            <div class="motivational-quote">
+                <p id="quoteText">Carregando frase motivacional...</p>
+                <button id="generateQuoteBtn" class="generate-quote-btn" title="Gerar nova frase motivacional">
+                    <i class="ph ph-sparkle" style="font-size: 1.2em;"></i>
+                </button>
+            </div>
+            <a href="https://www.linkedin.com/in/jo%C3%A3o-marcos-souza-pereira-38750a289/" target="_blank" class="linkedin-link">
+                <i class="ph ph-linkedin-logo" style="font-size: 1.5em;"></i>
+                <span>Visite meu LinkedIn</span>
+            </a>
         </div>
     </div>
 
-    <!-- Modal Customizado -->
+    <!-- Modal Customizado para Confirmações e Alertas -->
     <div id="customModal" class="modal-overlay">
         <div class="modal-content">
             <h3 id="modalTitle"></h3>
@@ -550,389 +919,847 @@
             </div>
         </div>
     </div>
+    
+    <!-- Modal para Tarefas Geradas por IA -->
+    <div id="generatedTasksModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="generatedTasksTitle"></h3>
+            <div id="generatedTasksContent">
+                <div class="loader"></div>
+            </div>
+            <div id="generatedTasksActions" class="modal-buttons" style="display: none;">
+                <button id="addGeneratedTasksBtn" class="modal-confirm-btn" style="background-color: var(--primary-color);">Adicionar Todas</button>
+                <button id="cancelGeneratedTasksBtn" class="modal-cancel-btn">Cancelar</button>
+            </div>
+        </div>
+    </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Referências aos elementos do DOM
-            const newTaskInput = document.getElementById('newTaskInput');
-            const prioritySelect = document.getElementById('prioritySelect');
-            const addTaskBtn = document.getElementById('addTaskBtn');
-            const taskList = document.getElementById('taskList');
-            const feedbackMessage = document.getElementById('feedbackMessage');
-            const searchInput = document.getElementById('searchInput');
-            const filterAllBtn = document.getElementById('filterAllBtn');
-            const filterPendingBtn = document.getElementById('filterPendingBtn');
-            const filterCompletedBtn = document.getElementById('filterCompletedBtn');
-            const clearCompletedBtn = document.getElementById('clearCompletedBtn');
-            const quoteText = document.getElementById('quoteText');
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, collection, query, writeBatch, addDoc, updateDoc, deleteDoc, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-            // Referências do Modal
-            const customModal = document.getElementById('customModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalMessage = document.getElementById('modalMessage');
-            const modalConfirmBtn = document.getElementById('modalConfirmBtn');
-            const modalCancelBtn = document.getElementById('modalCancelBtn');
+        // Variáveis globais de configuração do Firebase (fornecidas pelo ambiente)
+        // Substituímos os valores mockados pelas variáveis globais corretas.
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-            // Array para armazenar as tarefas
-            // Cada tarefa é um objeto { id: "...", text: "...", completed: false, priority: "Baixa" }
-            let tasks = [];
-            let currentFilter = 'all'; // 'all', 'pending', 'completed'
-            let currentSearchTerm = '';
+        // Inicializa o Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-            // Frases motivacionais para a JM Analytics
-            const motivationalQuotes = [
-                "A excelência é um hábito, não um ato. Continue construindo!",
-                "Cada tarefa concluída é um passo em direção ao sucesso da JM Analytics.",
-                "Transforme dados em decisões, e tarefas em conquistas.",
-                "O futuro é construído com as ações de hoje. Mãos à obra!",
-                "Sua produtividade é o motor da inovação na JM Analytics.",
-                "Organização é a chave para desbloquear seu potencial máximo."
-            ];
+        // Referências aos elementos do DOM
+        const dom = {
+            newTaskInput: document.getElementById('newTaskInput'),
+            prioritySelect: document.getElementById('prioritySelect'),
+            expectedTimeInput: document.getElementById('expectedTimeInput'),
+            addTaskBtn: document.getElementById('addTaskBtn'),
+            generateTasksBtn: document.getElementById('generateTasksBtn'),
+            taskList: document.getElementById('taskList'),
+            feedbackMessage: document.getElementById('feedbackMessage'),
+            searchInput: document.getElementById('searchInput'),
+            filterAllBtn: document.getElementById('filterAllBtn'),
+            filterPendingBtn: document.getElementById('filterPendingBtn'),
+            filterCompletedBtn: document.getElementById('filterCompletedBtn'),
+            clearCompletedBtn: document.getElementById('clearCompletedBtn'),
+            quoteText: document.getElementById('quoteText'),
+            generateQuoteBtn: document.getElementById('generateQuoteBtn'),
+            timerDisplay: document.getElementById('timerDisplay'),
+            studyTimeInput: document.getElementById('studyTimeInput'),
+            breakTimeInput: document.getElementById('breakTimeInput'),
+            startTimerBtn: document.getElementById('startTimerBtn'),
+            pauseTimerBtn: document.getElementById('pauseTimerBtn'),
+            resetTimerBtn: document.getElementById('resetTimerBtn'),
+            historyList: document.getElementById('historyList'),
+            customModal: document.getElementById('customModal'),
+            modalTitle: document.getElementById('modalTitle'),
+            modalMessage: document.getElementById('modalMessage'),
+            modalConfirmBtn: document.getElementById('modalConfirmBtn'),
+            modalCancelBtn: document.getElementById('modalCancelBtn'),
+            generatedTasksModal: document.getElementById('generatedTasksModal'),
+            generatedTasksTitle: document.getElementById('generatedTasksTitle'),
+            generatedTasksContent: document.getElementById('generatedTasksContent'),
+            generatedTasksActions: document.getElementById('generatedTasksActions'),
+            addGeneratedTasksBtn: document.getElementById('addGeneratedTasksBtn'),
+            cancelGeneratedTasksBtn: document.getElementById('cancelGeneratedTasksBtn'),
+            userInfo: document.getElementById('userInfo'),
+            loader: document.getElementById('loader'),
+            mainContent: document.getElementById('mainContent')
+        };
+        
+        // Variáveis de estado global
+        let userId = null;
+        let tasks = [];
+        let generatedTasks = []; // Novo array para armazenar tarefas geradas
+        let currentFilter = 'all';
+        let currentSearchTerm = '';
+        let timerInterval;
+        let totalSeconds;
+        let isPaused = true;
+        let isStudySession = true;
+        let history = [];
 
-            /**
-             * Exibe uma mensagem de feedback na tela.
-             * @param {string} message - A mensagem a ser exibida.
-             * @param {boolean} isSuccess - True se for uma mensagem de sucesso, false para erro.
-             */
-            function showFeedbackMessage(message, isSuccess = false) {
-                feedbackMessage.textContent = message;
-                feedbackMessage.classList.remove('success', 'danger'); // Limpa classes anteriores
-                feedbackMessage.classList.add(isSuccess ? 'success' : 'danger');
-                feedbackMessage.classList.add('show');
-                setTimeout(() => {
-                    feedbackMessage.classList.remove('show');
-                }, 3000); // Esconde a mensagem após 3 segundos
+        // Frases motivacionais para a JM Analytics (agora apenas fallback)
+        const motivationalQuotes = [
+            "A excelência é um hábito, não um ato. Continue construindo!",
+            "Cada tarefa concluída é um passo em direção ao sucesso da JM Analytics.",
+            "Transforme dados em decisões, e tarefas em conquistas.",
+            "O futuro é construído com as ações de hoje. Mãos à obra!",
+            "Sua produtividade é o motor da inovação na JM Analytics.",
+            "Organização é a chave para desbloquear seu potencial máximo."
+        ];
+        
+        /*
+         * Funções de Integração com a API do Gemini
+         */
+         
+        /**
+         * Faz uma chamada à API do Gemini para gerar sub-tarefas.
+         * @param {string} taskText - A tarefa principal a ser dividida.
+         * @returns {Promise<string[]>} Uma promessa com a lista de sub-tarefas.
+         */
+        async function getGeneratedSubtasks(taskText) {
+            const prompt = `Gere uma lista de 3 a 5 sub-tarefas curtas e práticas para a tarefa principal: '${taskText}'. As sub-tarefas devem ser acionáveis e diretas, com o objetivo de quebrar a tarefa grande em partes menores para um plano de estudos. Responda apenas com uma lista de strings em formato JSON, onde cada string é uma sub-tarefa.`;
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "ARRAY",
+                        items: { type: "STRING" }
+                    }
+                }
+            };
+
+            const apiKey = ""; // A chave será fornecida pelo ambiente
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            // Implementa a lógica de backoff exponencial
+            let retries = 0;
+            const maxRetries = 5;
+            while (retries < maxRetries) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0 && result.candidates[0].content) {
+                        return JSON.parse(result.candidates[0].content.parts[0].text);
+                    }
+                } catch (error) {
+                    console.error(`Erro ao chamar a API (tentativa ${retries + 1}):`, error);
+                    retries++;
+                    const delay = Math.pow(2, retries) * 1000;
+                    await new Promise(res => setTimeout(res, delay));
+                }
             }
+            throw new Error('Falha ao gerar sub-tarefas após várias tentativas.');
+        }
 
-            /**
-             * Exibe o modal customizado para confirmações ou mensagens.
-             * @param {string} title - Título do modal.
-             * @param {string} message - Mensagem principal do modal.
-             * @param {boolean} isConfirmation - Se true, exibe botões de confirmação/cancelamento.
-             * @returns {Promise<boolean>} Uma promessa que resolve para true se confirmado, false se cancelado.
-             */
-            function showCustomModal(title, message, isConfirmation = false) {
-                return new Promise((resolve) => {
-                    modalTitle.textContent = title;
-                    modalMessage.textContent = message;
+        /**
+         * Faz uma chamada à API do Gemini para gerar uma frase motivacional.
+         * @returns {Promise<string>} Uma promessa com a frase motivacional.
+         */
+        async function getGeneratedQuote() {
+            const prompt = "Gere uma única frase motivacional curta e inspiradora para estudantes, com no máximo 15 palavras. A frase deve ser otimista e focar na produtividade e no crescimento. Responda apenas com a frase.";
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: prompt }] }]
+            };
+            
+            const apiKey = ""; // A chave será fornecida pelo ambiente
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
-                    if (isConfirmation) {
-                        modalConfirmBtn.style.display = 'inline-block';
-                        modalCancelBtn.style.display = 'inline-block';
+            let retries = 0;
+            const maxRetries = 5;
+            while (retries < maxRetries) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0 && result.candidates[0].content) {
+                        return result.candidates[0].content.parts[0].text.trim().replace(/^"|"$/g, '');
+                    }
+                } catch (error) {
+                    console.error(`Erro ao chamar a API (tentativa ${retries + 1}):`, error);
+                    retries++;
+                    const delay = Math.pow(2, retries) * 1000;
+                    await new Promise(res => setTimeout(res, delay));
+                }
+            }
+            // Retorna uma frase padrão em caso de falha
+            return "O sucesso é a soma de pequenos esforços repetidos diariamente.";
+        }
+
+        /**
+         * Lógica de autenticação e carregamento de dados do usuário
+         * Esta é a primeira coisa que a aplicação faz.
+         */
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
+                dom.userInfo.textContent = `Usuário ID: ${userId}`;
+                await initializeDataListeners();
+            } else {
+                try {
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
                     } else {
-                        modalConfirmBtn.style.display = 'none'; // Esconde o botão de confirmação para mensagens simples
-                        modalCancelBtn.style.display = 'none'; // Esconde o botão de cancelamento
+                        await signInAnonymously(auth);
                     }
-
-                    customModal.classList.add('show');
-
-                    const handleConfirm = () => {
-                        customModal.classList.remove('show');
-                        modalConfirmBtn.removeEventListener('click', handleConfirm);
-                        modalCancelBtn.removeEventListener('click', handleCancel);
-                        resolve(true);
-                    };
-
-                    const handleCancel = () => {
-                        customModal.classList.remove('show');
-                        modalConfirmBtn.removeEventListener('click', handleConfirm);
-                        modalCancelBtn.removeEventListener('click', handleCancel);
-                        resolve(false);
-                    };
-
-                    modalConfirmBtn.addEventListener('click', handleConfirm);
-                    modalCancelBtn.addEventListener('click', handleCancel);
-                });
-            }
-
-            /**
-             * Carrega as tarefas do localStorage.
-             */
-            function loadTasks() {
-                const storedTasks = localStorage.getItem('jmAnalyticsTasks');
-                if (storedTasks) {
-                    tasks = JSON.parse(storedTasks); // Converte a string JSON de volta para array
-                } else {
-                    tasks = []; // Se não houver nada no localStorage, inicializa como array vazio
+                } catch (error) {
+                    console.error("Erro na autenticação:", error);
+                    dom.userInfo.textContent = "Erro na autenticação. Tente recarregar a página.";
+                    dom.loader.style.display = 'none';
                 }
             }
+        });
+        
+        /**
+         * Configura os listeners em tempo real para as coleções de tarefas e histórico do usuário.
+         * Esta função é chamada somente após o usuário ser autenticado.
+         */
+        async function initializeDataListeners() {
+            // Referência à coleção de tarefas do usuário
+            const tasksCol = collection(db, `artifacts/${appId}/users/${userId}/tasks`);
+            // Referência à coleção de histórico do usuário
+            const historyCol = collection(db, `artifacts/${appId}/users/${userId}/history`);
+            
+            // Listener para as tarefas (onSnapshot fornece atualizações em tempo real)
+            onSnapshot(tasksCol, (snapshot) => {
+                tasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderTasks();
+                dom.loader.style.display = 'none';
+                dom.mainContent.style.display = 'block';
+            }, (error) => {
+                console.error("Erro ao carregar tarefas:", error);
+                showFeedbackMessage("Erro ao carregar suas tarefas. Tente novamente.", false);
+                dom.loader.style.display = 'none';
+                dom.mainContent.style.display = 'block';
+            });
 
-            /**
-             * Salva as tarefas no localStorage.
-             */
-            function saveTasks() {
-                localStorage.setItem('jmAnalyticsTasks', JSON.stringify(tasks)); // Converte o array para string JSON
-            }
+            // Listener para o histórico
+            onSnapshot(historyCol, (snapshot) => {
+                history = snapshot.docs.map(doc => doc.data());
+                renderHistory();
+            }, (error) => {
+                console.error("Erro ao carregar histórico:", error);
+                showFeedbackMessage("Erro ao carregar seu histórico. Tente novamente.", false);
+            });
+        }
 
-            /**
-             * Renderiza as tarefas na tela, aplicando filtros e pesquisa.
-             */
-            function renderTasks() {
-                taskList.innerHTML = ''; // Limpa a lista existente para redesenhar
+        /*
+         * Funções Utilitárias e de Feedback
+         */
 
-                let filteredTasks = tasks.filter(task => {
-                    // Filtra por status
-                    if (currentFilter === 'pending' && task.completed) return false;
-                    if (currentFilter === 'completed' && !task.completed) return false;
+        /**
+         * Exibe uma mensagem de feedback na tela por 3 segundos.
+         * @param {string} message - A mensagem a ser exibida.
+         * @param {boolean} isSuccess - Se true, exibe mensagem de sucesso, caso contrário, de erro.
+         */
+        function showFeedbackMessage(message, isSuccess = false) {
+            dom.feedbackMessage.textContent = message;
+            dom.feedbackMessage.classList.remove('success', 'danger');
+            dom.feedbackMessage.classList.add(isSuccess ? 'success' : 'danger');
+            dom.feedbackMessage.classList.add('show');
+            setTimeout(() => {
+                dom.feedbackMessage.classList.remove('show');
+            }, 3000);
+        }
 
-                    // Filtra por termo de pesquisa
-                    if (currentSearchTerm && !task.text.toLowerCase().includes(currentSearchTerm.toLowerCase())) {
-                        return false;
-                    }
-                    return true;
-                });
+        /**
+         * Exibe o modal customizado para confirmações ou mensagens, substituindo `window.alert` e `window.confirm`.
+         * @param {string} title - Título do modal.
+         * @param {string} message - Mensagem principal do modal.
+         * @param {boolean} isConfirmation - Se true, exibe botões de confirmação/cancelamento.
+         * @returns {Promise<boolean>} Promessa que resolve para `true` se confirmado, `false` se cancelado.
+         */
+        function showCustomModal(title, message, isConfirmation = false) {
+            return new Promise((resolve) => {
+                dom.modalTitle.textContent = title;
+                dom.modalMessage.textContent = message;
+                
+                // Oculta os botões do modal padrão antes de mostrar
+                dom.modalConfirmBtn.style.display = 'none';
+                dom.modalCancelBtn.style.display = 'none';
 
-                if (filteredTasks.length === 0) {
-                    const noTasksMessage = document.createElement('li');
-                    noTasksMessage.textContent = currentSearchTerm ? "Nenhuma tarefa encontrada com este termo." : "Nenhuma tarefa adicionada ainda. Adicione uma!";
-                    noTasksMessage.style.textAlign = "center";
-                    noTasksMessage.style.fontStyle = "italic";
-                    noTasksMessage.style.color = "var(--text-color)";
-                    noTasksMessage.style.backgroundColor = "transparent";
-                    noTasksMessage.style.border = "none";
-                    taskList.appendChild(noTasksMessage);
-                    return;
+                if (isConfirmation) {
+                    dom.modalConfirmBtn.style.display = 'inline-block';
+                    dom.modalCancelBtn.style.display = 'inline-block';
                 }
 
-                filteredTasks.forEach(task => {
-                    const listItem = document.createElement('li');
-                    if (task.completed) {
-                        listItem.classList.add('completed');
-                    }
+                dom.customModal.classList.add('show');
 
-                    // Cria o span para o texto da tarefa (editável)
-                    const taskTextSpan = document.createElement('span');
-                    taskTextSpan.classList.add('task-text');
-                    taskTextSpan.textContent = task.text;
-                    taskTextSpan.contentEditable = false; // Não editável por padrão
-                    taskTextSpan.dataset.id = task.id; // Armazena o ID para referência
+                const handleConfirm = () => {
+                    dom.customModal.classList.remove('show');
+                    dom.modalConfirmBtn.removeEventListener('click', handleConfirm);
+                    dom.modalCancelBtn.removeEventListener('click', handleCancel);
+                    resolve(true);
+                };
 
-                    // Cria a tag de prioridade
-                    const priorityTag = document.createElement('span');
-                    priorityTag.classList.add('priority-tag', `priority-${task.priority.toLowerCase()}`);
-                    priorityTag.textContent = task.priority;
+                const handleCancel = () => {
+                    dom.customModal.classList.remove('show');
+                    dom.modalConfirmBtn.removeEventListener('click', handleConfirm);
+                    dom.modalCancelBtn.removeEventListener('click', handleCancel);
+                    resolve(false);
+                };
 
-                    listItem.innerHTML = `
-                        <div class="task-content"></div>
-                        <div class="task-actions">
-                            <button class="complete-btn" data-id="${task.id}" title="Marcar como Concluído">✔️</button>
-                            <button class="edit-btn" data-id="${task.id}" title="Editar Tarefa">✏️</button>
-                            <button class="delete-btn" data-id="${task.id}" title="Excluir Tarefa">❌</button>
-                        </div>
-                    `;
-                    // Adiciona o texto e a prioridade dentro do task-content
-                    listItem.querySelector('.task-content').appendChild(taskTextSpan);
-                    listItem.querySelector('.task-content').appendChild(priorityTag);
+                dom.modalConfirmBtn.addEventListener('click', handleConfirm);
+                dom.modalCancelBtn.addEventListener('click', handleCancel);
+            });
+        }
+        
+        /**
+         * Exibe o modal para as tarefas geradas pela IA.
+         * @param {string} title - Título do modal.
+         * @param {string[]} tasks - Array de strings com as tarefas geradas.
+         */
+        function showGeneratedTasksModal(title, tasks) {
+            dom.generatedTasksTitle.textContent = title;
+            dom.generatedTasksContent.innerHTML = '';
+            dom.generatedTasksActions.style.display = 'flex';
+            
+            const taskListUl = document.createElement('ul');
+            taskListUl.classList.add('generated-tasks-list');
+            
+            tasks.forEach(task => {
+                const li = document.createElement('li');
+                li.innerHTML = `<input type="checkbox" checked> <span>${task}</span>`;
+                taskListUl.appendChild(li);
+            });
+            dom.generatedTasksContent.appendChild(taskListUl);
+            dom.generatedTasksModal.classList.add('show');
+        }
 
-                    taskList.appendChild(listItem);
+        /*
+         * Funções de Renderização
+         * Descrição: Responsáveis por atualizar a interface do usuário com os dados atuais.
+         */
+
+        /**
+         * Renderiza as tarefas na tela, aplicando filtros e pesquisa.
+         */
+        function renderTasks() {
+            dom.taskList.innerHTML = ''; // Limpa a lista antes de renderizar
+
+            let filteredTasks = tasks.filter(task => {
+                // Lógica de filtro por status
+                if (currentFilter === 'pending' && task.completed) return false;
+                if (currentFilter === 'completed' && !task.completed) return false;
+                // Lógica de filtro por termo de pesquisa
+                if (currentSearchTerm && !task.text.toLowerCase().includes(currentSearchTerm.toLowerCase())) {
+                    return false;
+                }
+                return true;
+            });
+
+            if (filteredTasks.length === 0) {
+                const noTasksMessage = document.createElement('li');
+                noTasksMessage.textContent = currentSearchTerm ? "Nenhuma tarefa encontrada." : "Nenhuma tarefa adicionada ainda.";
+                // Atribui estilos diretamente para evitar classes CSS complexas para um único elemento
+                Object.assign(noTasksMessage.style, {
+                    textAlign: "center", fontStyle: "italic", color: "var(--text-color)",
+                    backgroundColor: "transparent", border: "none"
                 });
+                dom.taskList.appendChild(noTasksMessage);
+                return;
             }
 
-            /**
-             * Adiciona uma nova tarefa.
-             */
-            function addTask() {
-                const taskText = newTaskInput.value.trim();
-                const taskPriority = prioritySelect.value;
+            filteredTasks.forEach(task => {
+                const listItem = document.createElement('li');
+                if (task.completed) listItem.classList.add('completed');
 
-                if (taskText !== '') {
+                // Cria os elementos da tarefa
+                const taskTextSpan = document.createElement('span');
+                taskTextSpan.classList.add('task-text');
+                taskTextSpan.textContent = task.text;
+                taskTextSpan.contentEditable = false;
+                taskTextSpan.dataset.id = task.id;
+
+                const priorityTag = document.createElement('span');
+                priorityTag.classList.add('priority-tag', `priority-${task.priority.toLowerCase()}`);
+                priorityTag.textContent = task.priority;
+                
+                const expectedTimeTag = document.createElement('span');
+                expectedTimeTag.classList.add('expected-time');
+                expectedTimeTag.innerHTML = `<i class="ph ph-clock" style="font-size: 1.1em;"></i> ${task.expectedTime} min`;
+
+                // Estrutura o HTML interno da tarefa
+                listItem.innerHTML = `
+                    <div class="task-content"></div>
+                    <div class="task-actions">
+                        <button class="complete-btn" data-id="${task.id}" title="Marcar como Concluído"><i class="ph ph-check"></i></button>
+                        <button class="edit-btn" data-id="${task.id}" title="Editar Tarefa"><i class="ph ph-pencil"></i></button>
+                        <button class="delete-btn" data-id="${task.id}" title="Excluir Tarefa"><i class="ph ph-trash"></i></button>
+                    </div>
+                `;
+                const taskContentDiv = listItem.querySelector('.task-content');
+                taskContentDiv.appendChild(taskTextSpan);
+                taskContentDiv.appendChild(priorityTag);
+                taskContentDiv.appendChild(expectedTimeTag);
+
+                dom.taskList.appendChild(listItem);
+            });
+        }
+
+        /**
+         * Renderiza o histórico de sessões na tela.
+         */
+        function renderHistory() {
+            dom.historyList.innerHTML = '';
+            if (history.length === 0) {
+                const noHistoryMessage = document.createElement('li');
+                noHistoryMessage.textContent = "Nenhuma sessão registrada ainda.";
+                Object.assign(noHistoryMessage.style, {
+                    textAlign: "center", fontStyle: "italic", backgroundColor: "transparent", border: "none"
+                });
+                dom.historyList.appendChild(noHistoryMessage);
+                return;
+            }
+
+            history.forEach(session => {
+                const listItem = document.createElement('li');
+                listItem.classList.add(`history-${session.type.toLowerCase()}`);
+                listItem.innerHTML = `
+                    <div class="history-info">
+                        <span>**${session.type}**</span>
+                        <small>${session.date}</small>
+                    </div>
+                    <span>${session.duration} min</span>
+                `;
+                dom.historyList.appendChild(listItem);
+            });
+        }
+
+        /**
+         * Exibe uma frase motivacional aleatória.
+         */
+        async function displayMotivationalQuote() {
+            try {
+                const quote = await getGeneratedQuote();
+                dom.quoteText.textContent = quote;
+            } catch (e) {
+                console.error(e);
+                const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
+                dom.quoteText.textContent = motivationalQuotes[randomIndex];
+            }
+        }
+        
+        /*
+         * Funções de Lógica da Aplicação (Tarefas)
+         * Todas as funções de manipulação de dados foram alteradas para interagir com o Firestore.
+         */
+
+        /**
+         * Adiciona uma nova tarefa à lista no Firestore.
+         */
+        async function addTask() {
+            const taskText = dom.newTaskInput.value.trim();
+            const taskPriority = dom.prioritySelect.value;
+            const expectedTime = parseInt(dom.expectedTimeInput.value);
+
+            if (taskText === '') {
+                showFeedbackMessage('Por favor, digite uma tarefa!');
+                dom.newTaskInput.focus();
+                return;
+            }
+            
+            if (isNaN(expectedTime) || expectedTime <= 0) {
+                showFeedbackMessage('Por favor, insira um tempo válido (maior que 0)!');
+                dom.expectedTimeInput.focus();
+                return;
+            }
+            
+            if (!userId) return; // Garante que o usuário está autenticado
+
+            try {
+                const tasksCol = collection(db, `artifacts/${appId}/users/${userId}/tasks`);
+                await addDoc(tasksCol, {
+                    text: taskText,
+                    completed: false,
+                    priority: taskPriority,
+                    expectedTime: expectedTime,
+                    createdAt: serverTimestamp()
+                });
+                dom.newTaskInput.value = '';
+                dom.prioritySelect.value = 'Baixa';
+                dom.expectedTimeInput.value = '30';
+                showFeedbackMessage('Tarefa adicionada com sucesso!', true);
+            } catch (error) {
+                console.error("Erro ao adicionar tarefa:", error);
+                showFeedbackMessage('Erro ao adicionar tarefa. Tente novamente.', false);
+            }
+        }
+        
+        /**
+         * Lógica para gerar e exibir tarefas sugeridas pela IA.
+         */
+        async function generateTasks() {
+            const taskText = dom.newTaskInput.value.trim();
+            if (taskText === '') {
+                showFeedbackMessage('Por favor, digite uma tarefa para gerar sub-tarefas!', false);
+                return;
+            }
+            
+            dom.generatedTasksTitle.textContent = "Gerando tarefas...";
+            dom.generatedTasksContent.innerHTML = '<div class="loader"></div>';
+            dom.generatedTasksActions.style.display = 'none';
+            dom.generatedTasksModal.classList.add('show');
+            
+            try {
+                generatedTasks = await getGeneratedSubtasks(taskText);
+                dom.generatedTasksTitle.textContent = `Tarefas geradas para "${taskText}"`;
+                dom.generatedTasksContent.innerHTML = '';
+                
+                const taskListUl = document.createElement('ul');
+                taskListUl.classList.add('generated-tasks-list');
+                
+                generatedTasks.forEach(task => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<input type="checkbox" checked> <span>${task}</span>`;
+                    taskListUl.appendChild(li);
+                });
+                dom.generatedTasksContent.appendChild(taskListUl);
+                dom.generatedTasksActions.style.display = 'flex';
+                
+            } catch (error) {
+                dom.generatedTasksTitle.textContent = "Erro ao gerar tarefas.";
+                dom.generatedTasksContent.innerHTML = `<p>${error.message}</p>`;
+                dom.generatedTasksActions.style.display = 'flex';
+                dom.addGeneratedTasksBtn.style.display = 'none';
+            }
+        }
+        
+        /**
+         * Adiciona as tarefas selecionadas do modal para a lista principal.
+         */
+        async function addGeneratedTasks() {
+            if (!userId) return;
+            const tasksToAdd = Array.from(dom.generatedTasksContent.querySelectorAll('input:checked'))
+                                     .map(checkbox => checkbox.nextElementSibling.textContent);
+            
+            if (tasksToAdd.length === 0) {
+                showFeedbackMessage('Nenhuma tarefa selecionada para adicionar.', false);
+                return;
+            }
+
+            try {
+                const batch = writeBatch(db);
+                const tasksCol = collection(db, `artifacts/${appId}/users/${userId}/tasks`);
+                
+                tasksToAdd.forEach(taskText => {
                     const newTask = {
-                        id: Date.now().toString(), // ID único baseado no timestamp
                         text: taskText,
                         completed: false,
-                        priority: taskPriority
+                        priority: dom.prioritySelect.value,
+                        expectedTime: 30, // Valor padrão para tarefas geradas
+                        createdAt: serverTimestamp()
                     };
-                    tasks.push(newTask);
-                    newTaskInput.value = ''; // Limpa o input
-                    prioritySelect.value = 'Baixa'; // Reseta a prioridade
-                    saveTasks(); // Salva as tarefas
-                    renderTasks(); // Redesenha a lista
-                    showFeedbackMessage('Tarefa adicionada com sucesso!', true);
-                } else {
-                    showFeedbackMessage('Por favor, digite uma tarefa!');
-                    newTaskInput.focus();
-                }
+                    batch.set(doc(tasksCol), newTask);
+                });
+                
+                await batch.commit();
+                dom.generatedTasksModal.classList.remove('show');
+                showFeedbackMessage(`${tasksToAdd.length} tarefas adicionadas com sucesso!`, true);
+            } catch (error) {
+                console.error("Erro ao adicionar tarefas em massa:", error);
+                showFeedbackMessage('Erro ao adicionar tarefas geradas. Tente novamente.', false);
             }
+        }
 
-            /**
-             * Alterna o status de conclusão de uma tarefa.
-             * @param {string} id - O ID da tarefa.
-             */
-            function toggleComplete(id) {
-                const taskIndex = tasks.findIndex(task => task.id === id);
-                if (taskIndex > -1) {
-                    tasks[taskIndex].completed = !tasks[taskIndex].completed;
-                    saveTasks();
-                    renderTasks();
+        /**
+         * Alterna o status de conclusão de uma tarefa no Firestore.
+         * @param {string} id - O ID da tarefa.
+         */
+        async function toggleComplete(id) {
+            if (!userId) return;
+
+            try {
+                const taskRef = doc(db, `artifacts/${appId}/users/${userId}/tasks`, id);
+                const taskToUpdate = tasks.find(t => t.id === id);
+                if (taskToUpdate) {
+                    await updateDoc(taskRef, { completed: !taskToUpdate.completed });
                     showFeedbackMessage('Status da tarefa atualizado!', true);
                 }
+            } catch (error) {
+                console.error("Erro ao atualizar tarefa:", error);
+                showFeedbackMessage('Erro ao atualizar tarefa. Tente novamente.', false);
             }
+        }
 
-            /**
-             * Inicia a edição de uma tarefa.
-             * @param {string} id - O ID da tarefa.
-             */
-            function startEditTask(id) {
-                const taskTextSpan = taskList.querySelector(`.task-text[data-id="${id}"]`);
-                if (taskTextSpan) {
-                    taskTextSpan.contentEditable = true;
-                    taskTextSpan.classList.add('editing');
-                    taskTextSpan.focus(); // Coloca o foco no elemento editável
+        /**
+         * Inicia a edição de uma tarefa.
+         * @param {string} id - O ID da tarefa.
+         */
+        function startEditTask(id) {
+            const taskTextSpan = dom.taskList.querySelector(`.task-text[data-id="${id}"]`);
+            if (taskTextSpan) {
+                taskTextSpan.contentEditable = true;
+                taskTextSpan.classList.add('editing');
+                taskTextSpan.focus();
+                const range = document.createRange();
+                range.selectNodeContents(taskTextSpan);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
 
-                    // Seleciona todo o texto para facilitar a edição
-                    const range = document.createRange();
-                    range.selectNodeContents(taskTextSpan);
-                    const selection = window.getSelection();
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-
-                    // Adiciona listeners para salvar ao sair do foco ou pressionar Enter
-                    taskTextSpan.addEventListener('blur', () => saveEditedTask(id, taskTextSpan), { once: true });
-                    taskTextSpan.addEventListener('keypress', (event) => {
-                        if (event.key === 'Enter') {
-                            event.preventDefault(); // Impede quebra de linha
-                            taskTextSpan.blur(); // Salva ao pressionar Enter
-                        }
-                    }, { once: true });
-                }
-            }
-
-            /**
-             * Salva o texto editado de uma tarefa.
-             * @param {string} id - O ID da tarefa.
-             * @param {HTMLElement} taskTextSpan - O elemento span do texto da tarefa.
-             */
-            function saveEditedTask(id, taskTextSpan) {
-                taskTextSpan.contentEditable = false;
-                taskTextSpan.classList.remove('editing');
-                const newText = taskTextSpan.textContent.trim();
-
-                const taskIndex = tasks.findIndex(task => task.id === id);
-                if (taskIndex > -1 && newText !== '') {
-                    tasks[taskIndex].text = newText;
-                    saveTasks();
-                    renderTasks(); // Redesenha para garantir que a UI esteja atualizada
-                    showFeedbackMessage('Tarefa editada com sucesso!', true);
-                } else if (newText === '') {
-                    // Se o texto ficar vazio, reverte para o original e informa o usuário
-                    tasks[taskIndex].text = tasks[taskIndex].text; // Reverte para o texto original
-                    renderTasks(); // Redesenha com o texto original
-                    showFeedbackMessage('O texto da tarefa não pode ser vazio!', false);
-                }
-            }
-
-            /**
-             * Remove uma tarefa.
-             * @param {string} id - O ID da tarefa.
-             */
-            async function deleteTask(id) {
-                const confirmed = await showCustomModal(
-                    'Confirmar Exclusão',
-                    'Tem certeza que deseja excluir esta tarefa?',
-                    true // É uma confirmação
-                );
-
-                if (confirmed) {
-                    tasks = tasks.filter(task => task.id !== id); // Remove a tarefa do array
-                    saveTasks(); // Salva as tarefas
-                    renderTasks(); // Redesenha a lista
-                    showFeedbackMessage('Tarefa excluída com sucesso!', true);
-                }
-            }
-
-            /**
-             * Limpa todas as tarefas concluídas.
-             */
-            async function clearCompletedTasks() {
-                const confirmed = await showCustomModal(
-                    'Limpar Tarefas Concluídas',
-                    'Tem certeza que deseja remover todas as tarefas concluídas? Esta ação é irreversível.',
-                    true // É uma confirmação
-                );
-
-                if (confirmed) {
-                    const initialLength = tasks.length;
-                    tasks = tasks.filter(task => !task.completed); // Filtra as não concluídas
-                    if (tasks.length < initialLength) { // Verifica se alguma tarefa foi removida
-                        saveTasks();
-                        renderTasks();
-                        showFeedbackMessage('Tarefas concluídas limpas!', true);
-                    } else {
-                        showFeedbackMessage('Nenhuma tarefa concluída para limpar.', false);
+                // Salva ao perder o foco ou pressionar Enter
+                taskTextSpan.addEventListener('blur', () => saveEditedTask(id, taskTextSpan), { once: true });
+                taskTextSpan.addEventListener('keypress', (event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        taskTextSpan.blur();
                     }
-                }
+                }, { once: true });
             }
+        }
 
-            /**
-             * Define o filtro ativo e renderiza as tarefas.
-             * @param {string} filterType - O tipo de filtro ('all', 'pending', 'completed').
-             */
-            function setFilter(filterType) {
-                currentFilter = filterType;
-                // Atualiza a classe 'active' nos botões de filtro
-                filterAllBtn.classList.remove('active');
-                filterPendingBtn.classList.remove('active');
-                filterCompletedBtn.classList.remove('active');
-                document.getElementById(`filter${filterType.charAt(0).toUpperCase() + filterType.slice(1)}Btn`).classList.add('active');
+        /**
+         * Salva o texto editado de uma tarefa no Firestore.
+         * @param {string} id - O ID da tarefa.
+         * @param {HTMLElement} taskTextSpan - O elemento span do texto da tarefa.
+         */
+        async function saveEditedTask(id, taskTextSpan) {
+            taskTextSpan.contentEditable = false;
+            taskTextSpan.classList.remove('editing');
+            const newText = taskTextSpan.textContent.trim();
+            const taskIndex = tasks.findIndex(task => task.id === id);
+
+            if (!userId || taskIndex === -1) return;
+
+            if (newText !== '') {
+                try {
+                    const taskRef = doc(db, `artifacts/${appId}/users/${userId}/tasks`, id);
+                    await updateDoc(taskRef, { text: newText });
+                    showFeedbackMessage('Tarefa editada com sucesso!', true);
+                } catch (error) {
+                    console.error("Erro ao editar tarefa:", error);
+                    showFeedbackMessage('Erro ao editar tarefa. Tente novamente.', false);
+                }
+            } else {
+                taskTextSpan.textContent = tasks[taskIndex].text; // Reverte o texto
+                showFeedbackMessage('O texto da tarefa não pode ser vazio!', false);
                 renderTasks();
             }
+        }
 
-            /**
-             * Exibe uma frase motivacional aleatória.
-             */
-            function displayMotivationalQuote() {
-                const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
-                quoteText.textContent = motivationalQuotes[randomIndex];
+        /**
+         * Remove uma tarefa do Firestore após confirmação do usuário.
+         * @param {string} id - O ID da tarefa.
+         */
+        async function deleteTask(id) {
+            const confirmed = await showCustomModal(
+                'Confirmar Exclusão',
+                'Tem certeza que deseja excluir esta tarefa?',
+                true
+            );
+            if (confirmed) {
+                if (!userId) return;
+                try {
+                    const taskRef = doc(db, `artifacts/${appId}/users/${userId}/tasks`, id);
+                    await deleteDoc(taskRef);
+                    showFeedbackMessage('Tarefa excluída com sucesso!', true);
+                } catch (error) {
+                    console.error("Erro ao excluir tarefa:", error);
+                    showFeedbackMessage('Erro ao excluir tarefa. Tente novamente.', false);
+                }
+            }
+        }
+
+        /**
+         * Limpa todas as tarefas concluídas do Firestore após confirmação do usuário.
+         */
+        async function clearCompletedTasks() {
+            const completedTasks = tasks.filter(task => task.completed);
+            if (completedTasks.length === 0) {
+                showFeedbackMessage('Nenhuma tarefa concluída para limpar.', false);
+                return;
             }
 
-            // --- Event Listeners ---
-
-            // Botão "Adicionar"
-            addTaskBtn.addEventListener('click', addTask);
-
-            // Adicionar tarefa ao pressionar "Enter" no campo de input
-            newTaskInput.addEventListener('keypress', (event) => {
-                if (event.key === 'Enter') {
-                    addTask();
+            const confirmed = await showCustomModal(
+                'Limpar Tarefas Concluídas',
+                'Tem certeza que deseja remover todas as tarefas concluídas? Esta ação é irreversível.',
+                true
+            );
+            
+            if (confirmed && userId) {
+                try {
+                    const batch = writeBatch(db);
+                    completedTasks.forEach(task => {
+                        const taskRef = doc(db, `artifacts/${appId}/users/${userId}/tasks`, task.id);
+                        batch.delete(taskRef);
+                    });
+                    await batch.commit();
+                    showFeedbackMessage('Tarefas concluídas limpas!', true);
+                } catch (error) {
+                    console.error("Erro ao limpar tarefas concluídas:", error);
+                    showFeedbackMessage('Erro ao limpar tarefas concluídas. Tente novamente.', false);
                 }
+            }
+        }
+
+        /**
+         * Define o filtro ativo e renderiza as tarefas.
+         * @param {string} filterType - O tipo de filtro ('all', 'pending', 'completed').
+         */
+        function setFilter(filterType) {
+            currentFilter = filterType;
+            dom.filterAllBtn.classList.remove('active');
+            dom.filterPendingBtn.classList.remove('active');
+            dom.filterCompletedBtn.classList.remove('active');
+            document.getElementById(`filter${filterType.charAt(0).toUpperCase() + filterType.slice(1)}Btn`).classList.add('active');
+            renderTasks();
+        }
+
+        /*
+         * Funções de Lógica da Aplicação (Timer)
+         */
+
+        /**
+         * Converte segundos em formato MM:SS.
+         * @param {number} seconds - O número de segundos.
+         * @returns {string} O tempo formatado.
+         */
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+        }
+
+        /**
+         * Adiciona uma sessão ao histórico no Firestore.
+         * @param {string} type - Tipo da sessão ('Estudo' ou 'Descanso').
+         * @param {number} duration - Duração da sessão em minutos.
+         */
+        async function addSessionToHistory(type, duration) {
+            if (!userId) return;
+            try {
+                const historyCol = collection(db, `artifacts/${appId}/users/${userId}/history`);
+                await addDoc(historyCol, {
+                    date: new Date().toLocaleDateString('pt-BR'),
+                    type: type,
+                    duration: duration,
+                    createdAt: serverTimestamp()
+                });
+            } catch (error) {
+                console.error("Erro ao adicionar sessão ao histórico:", error);
+                showFeedbackMessage('Erro ao registrar sessão no histórico. Tente novamente.', false);
+            }
+        }
+
+        /**
+         * Inicia o timer com a lógica de Pomodoro, alternando entre estudo e descanso.
+         */
+        function startTimer() {
+            if (!isPaused) return;
+            isPaused = false;
+            dom.startTimerBtn.style.display = 'none';
+            dom.pauseTimerBtn.style.display = 'inline-block';
+
+            if (totalSeconds === undefined) {
+                totalSeconds = parseInt(dom.studyTimeInput.value) * 60;
+                isStudySession = true;
+            }
+            
+            timerInterval = setInterval(() => {
+                if (totalSeconds > 0) {
+                    totalSeconds--;
+                    dom.timerDisplay.textContent = formatTime(totalSeconds);
+                } else {
+                    clearInterval(timerInterval);
+                    if (isStudySession) {
+                        addSessionToHistory('Estudo', parseInt(dom.studyTimeInput.value));
+                        showCustomModal('Sessão de Estudo Concluída!', 'Hora de fazer uma pausa!');
+                        totalSeconds = parseInt(dom.breakTimeInput.value) * 60;
+                        isStudySession = false;
+                    } else {
+                        addSessionToHistory('Descanso', parseInt(dom.breakTimeInput.value));
+                        showCustomModal('Pausa Concluída!', 'Hora de voltar a estudar!');
+                        totalSeconds = parseInt(dom.studyTimeInput.value) * 60;
+                        isStudySession = true;
+                    }
+                    startTimer();
+                }
+            }, 1000);
+        }
+        
+        /**
+         * Pausa o timer, limpando o intervalo.
+         */
+        function pauseTimer() {
+            isPaused = true;
+            clearInterval(timerInterval);
+            dom.startTimerBtn.style.display = 'inline-block';
+            dom.pauseTimerBtn.style.display = 'none';
+        }
+
+        /**
+         * Reseta o timer para o tempo de estudo inicial.
+         */
+        function resetTimer() {
+            pauseTimer();
+            isStudySession = true;
+            totalSeconds = parseInt(dom.studyTimeInput.value) * 60;
+            dom.timerDisplay.textContent = formatTime(totalSeconds);
+        }
+
+        /**
+         * Lógica de inicialização da aplicação e listeners de eventos.
+         */
+        function initApp() {
+            displayMotivationalQuote();
+            resetTimer();
+
+            dom.addTaskBtn.addEventListener('click', addTask);
+            dom.generateTasksBtn.addEventListener('click', generateTasks);
+            dom.addGeneratedTasksBtn.addEventListener('click', addGeneratedTasks);
+            dom.cancelGeneratedTasksBtn.addEventListener('click', () => dom.generatedTasksModal.classList.remove('show'));
+            dom.generateQuoteBtn.addEventListener('click', displayMotivationalQuote);
+
+            dom.newTaskInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') addTask();
             });
 
-            // Gerenciamento de cliques na lista de tarefas (delegation)
-            taskList.addEventListener('click', (event) => {
+            dom.taskList.addEventListener('click', (event) => {
                 const target = event.target;
-                const taskId = target.dataset.id; // Pega o ID do atributo data-id
+                const taskId = target.dataset.id || target.closest('button')?.dataset.id;
+                if (!taskId) return;
 
-                if (target.classList.contains('complete-btn')) {
-                    toggleComplete(taskId);
-                } else if (target.classList.contains('edit-btn')) {
-                    startEditTask(taskId);
-                } else if (target.classList.contains('delete-btn')) {
-                    deleteTask(taskId);
-                } else if (target.classList.contains('task-text') && !target.classList.contains('editing')) {
-                    // Permite iniciar edição clicando no texto
+                if (target.closest('.complete-btn')) toggleComplete(taskId);
+                else if (target.closest('.edit-btn')) startEditTask(taskId);
+                else if (target.closest('.delete-btn')) deleteTask(taskId);
+                else if (target.classList.contains('task-text') && !target.classList.contains('editing')) {
                     startEditTask(taskId);
                 }
             });
 
-            // Event listener para pesquisa
-            searchInput.addEventListener('input', (event) => {
+            dom.searchInput.addEventListener('input', (event) => {
                 currentSearchTerm = event.target.value.trim();
                 renderTasks();
             });
 
-            // Event listeners para os botões de filtro
-            filterAllBtn.addEventListener('click', () => setFilter('all'));
-            filterPendingBtn.addEventListener('click', () => setFilter('pending'));
-            filterCompletedBtn.addEventListener('click', () => setFilter('completed'));
+            dom.filterAllBtn.addEventListener('click', () => setFilter('all'));
+            dom.filterPendingBtn.addEventListener('click', () => setFilter('pending'));
+            dom.filterCompletedBtn.addEventListener('click', () => setFilter('completed'));
+            dom.clearCompletedBtn.addEventListener('click', clearCompletedTasks);
+            
+            dom.startTimerBtn.addEventListener('click', startTimer);
+            dom.pauseTimerBtn.addEventListener('click', pauseTimer);
+            dom.resetTimerBtn.addEventListener('click', resetTimer);
 
-            // Event listener para o botão "Limpar Concluídas"
-            clearCompletedBtn.addEventListener('click', clearCompletedTasks);
+            dom.studyTimeInput.addEventListener('change', resetTimer);
+            dom.breakTimeInput.addEventListener('change', resetTimer);
+        }
 
-            // Carrega as tarefas e renderiza ao carregar a página
-            loadTasks();
-            renderTasks();
-            displayMotivationalQuote(); // Exibe uma frase motivacional ao carregar
-        });
+        initApp();
+
     </script>
 </body>
 </html>
