@@ -3,1675 +3,514 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relógio Inteligente de Estudos</title>
-    <!-- Link para a fonte Inter do Google Fonts para uma tipografia moderna e legível -->
+    <title>Relógio de Foco</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- Link para ícones Phosphor Icons para botões e elementos visuais -->
-    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /*
-         * Seção: Variáveis de Design e Estilos Globais
-         * Descrição: Paleta de cores preto e dourado com efeitos de néon.
-         */
+        /* Seção: Variáveis de Design e Estilos Globais */
         :root {
-            --primary-color: #FFD700; /* Dourado: Ação, Foco, Recompensa */
+            --primary-color: #FFD700; /* Dourado */
             --primary-color-hover: #E5C100;
-            --secondary-color: #BDB76B; /* Dourado suave para textos */
-            --background-color: #0A0A0A; /* Preto profundo para o fundo */
-            --surface-color: #1A1A1A; /* Cinza escuro para cards e elementos principais */
-            --text-color: #F0F0F0; /* Branco-sujo para legibilidade */
-            --border-color: #444444; /* Cinza escuro para bordas sutis */
-            --success-color: #2ECC71; /* Verde: Sucesso */
-            --danger-color: #FF6347; /* Vermelho: Ações destrutivas */
-            --info-color: #3498DB; /* Azul: Informação */
-            --priority-low: #34A853; /* Verde para prioridade baixa */
-            --priority-medium: #F9A825; /* Amarelo para prioridade média */
-            --priority-high: #EA4335; /* Vermelho para prioridade alta */
-            --neon-shadow: 0 0 5px rgba(255, 215, 0, 0.6);
+            --background-color: #0A0A0A; /* Preto profundo */
+            --surface-color: #1A1A1A; /* Cinza escuro para cards */
+            --text-color: #F0F0F0; /* Branco-sujo */
+            --border-color: #444444;
+            --danger-color: #FF6347;
+            --danger-color-hover: #E0553D;
+            --success-color: #2ECC71;
         }
 
-        /* Estilos base e reset para uma experiência limpa e escura */
+        /* Seção: Estilos base e reset */
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--background-color);
             color: var(--text-color);
             margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
+            align-items: center;
             min-height: 100vh;
-            padding: 50px 20px;
+            padding: 20px;
             box-sizing: border-box;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        /* Estilo para o efeito de nuvens em cascata */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: linear-gradient(
-                180deg,
-                rgba(255, 255, 255, 0.05) 0%,
-                rgba(255, 255, 255, 0.03) 25%,
-                rgba(255, 255, 255, 0.02) 50%,
-                rgba(255, 255, 255, 0.01) 75%,
-                rgba(255, 255, 255, 0) 100%
-            );
-            background-size: 100% 200%;
-            animation: cascade-clouds 30s linear infinite;
-            z-index: 0;
-            opacity: 0.2;
-        }
-
-        @keyframes cascade-clouds {
-            from {
-                background-position: 0 0;
-            }
-            to {
-                background-position: 0 200%;
-            }
         }
 
         .container {
             background-color: var(--surface-color);
             border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            padding: 30px 40px;
             width: 100%;
-            max-width: 600px;
+            max-width: 500px;
+            text-align: center;
             position: relative;
-            z-index: 1;
+            overflow: hidden;
         }
 
         h1 {
             color: var(--primary-color);
-            text-align: center;
-            margin-bottom: 30px;
+            margin-top: 0;
+            margin-bottom: 25px;
             font-weight: 700;
             font-size: 2em;
-            text-shadow: var(--neon-shadow);
         }
 
-        .user-info {
-            text-align: center;
-            font-size: 0.8em;
-            color: var(--secondary-color);
-            margin-bottom: 20px;
-        }
-        
-        /*
-         * Seção: Estilos do Timer
-         * Descrição: Contém os estilos para a interface do timer Pomodoro.
-         */
-        .pomodoro-timer {
-            text-align: center;
+        /* Seção: Estilos do Temporizador */
+        .timer-section {
             margin-bottom: 30px;
-            padding: 20px;
+        }
+
+        #studyTopicInput {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
             background-color: var(--background-color);
-            border-radius: 10px;
             border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 1em;
+            box-sizing: border-box;
+            text-align: center;
         }
         
-        .pomodoro-timer h3 {
-            color: var(--primary-color);
-            font-weight: 600;
-            margin-bottom: 5px;
-            text-shadow: 0 0 3px var(--primary-color);
-        }
-        
-        .pomodoro-timer p {
-            font-size: 0.9em;
-            color: var(--secondary-color);
-            margin-bottom: 15px;
+        #studyTopicInput:focus {
+             border-color: var(--primary-color);
+             outline: none;
+             box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.4);
         }
 
-        .timer-display {
-            font-size: 3em;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            letter-spacing: 2px;
-            font-variant-numeric: tabular-nums;
-            text-shadow: var(--neon-shadow);
-        }
-
-        .timer-controls {
+        .time-inputs {
             display: flex;
             justify-content: center;
             gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .time-inputs input {
+            width: 60px;
+            padding: 10px;
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 1.2em;
+            text-align: center;
+        }
+        
+        .time-inputs span {
+            font-size: 1.2em;
+            color: var(--primary-color);
+        }
+
+        #timerDisplay {
+            font-size: 3.5em;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-variant-numeric: tabular-nums;
         }
 
         .timer-controls button {
-            background-color: var(--primary-color);
-            color: #1A1A1A;
-            padding: 10px 15px;
+            padding: 12px 25px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            box-shadow: 0 0 5px var(--primary-color);
-        }
-
-        .timer-controls button:hover {
-            background-color: var(--primary-color-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 0 8px var(--primary-color), 0 0 15px rgba(255, 215, 0, 0.4);
-        }
-
-        .timer-controls button:active {
-            transform: translateY(0);
-            box-shadow: 0 0 5px var(--primary-color);
-        }
-        
-        .timer-config {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-
-        .timer-config label {
-            font-size: 0.9em;
-            color: var(--secondary-color);
-            font-weight: 600;
-        }
-
-        .timer-config input {
-            width: 45px;
-            padding: 5px;
-            text-align: center;
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            font-size: 0.9em;
-            background-color: var(--surface-color);
-            color: var(--text-color);
-        }
-
-        /*
-         * Seção: Estilos da Lista de Tarefas
-         * Descrição: Estilos para adicionar, filtrar e visualizar as tarefas.
-         */
-        .add-task-section {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .add-task-section input[type="text"],
-        .add-task-section select,
-        .add-task-section .time-input-group input {
-            flex-grow: 1;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1em;
-            color: var(--text-color);
-            outline: none;
-            background-color: var(--surface-color);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .add-task-section input[type="text"]:focus,
-        .add-task-section select:focus,
-        .add-task-section .time-input-group input:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.4);
-        }
-        
-        .add-task-section .time-input-group {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            flex-grow: 1;
-        }
-        
-        .add-task-buttons {
-            display: flex;
-            flex-grow: 1;
-            gap: 10px;
-        }
-
-        .add-task-section button {
-            background-color: var(--primary-color);
-            color: #1A1A1A;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            box-shadow: 0 0 5px var(--primary-color);
-        }
-        
-        .add-task-section .generate-btn {
-            background-color: var(--secondary-color);
-            color: #1A1A1A;
-            flex-grow: 1;
-            box-shadow: 0 0 5px var(--secondary-color);
-        }
-
-        .add-task-section button:hover {
-            background-color: var(--primary-color-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 0 8px var(--primary-color), 0 0 15px rgba(255, 215, 0, 0.4);
-        }
-        
-        .add-task-section .generate-btn:hover {
-            background-color: #A09E5F;
-            transform: translateY(-1px);
-            box-shadow: 0 0 8px var(--secondary-color), 0 0 15px rgba(189, 183, 107, 0.4);
-        }
-
-        .add-task-section button:active {
-            transform: translateY(0);
-            box-shadow: 0 0 5px var(--primary-color);
-        }
-
-        .controls-section {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .controls-section input[type="text"] {
-            flex-grow: 1;
-            padding: 10px 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 0.95em;
-            color: var(--text-color);
-            outline: none;
-            background-color: var(--surface-color);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .controls-section input[type="text"]:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.4);
-        }
-
-        .filter-buttons button {
-            background-color: var(--surface-color);
-            color: var(--secondary-color);
-            padding: 8px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.2s ease;
-        }
-
-        .filter-buttons button:hover {
-            background-color: #2A2A2A;
-        }
-
-        .filter-buttons button.active {
-            background-color: var(--primary-color);
-            color: var(--surface-color);
-            border-color: var(--primary-color);
-            box-shadow: 0 0 5px var(--primary-color);
-        }
-
-        .task-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .task-list li {
-            background-color: var(--surface-color);
-            border: none;
-            border-left: 4px solid var(--border-color);
-            border-radius: 8px;
-            padding: 15px 20px;
-            margin-bottom: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 1em;
-            transition: background-color 0.2s ease, box-shadow 0.2s ease;
-            position: relative;
-        }
-        
-        .task-list li:hover {
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 5px rgba(255, 215, 0, 0.2);
-        }
-        
-        .task-list li.completed {
-            background-color: #2A2A2A;
-            border-left-color: var(--success-color);
-            color: #718096;
-            text-decoration: line-through;
-            opacity: 0.8;
-        }
-
-        .task-content {
-            display: flex;
-            align-items: center;
-            flex-grow: 1;
-            margin-right: 15px;
-            min-width: 0;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .task-text {
-            word-break: break-word;
-            cursor: pointer;
-            padding: 2px 5px;
-            border-radius: 4px;
-            transition: background-color 0.2s ease;
-            flex-grow: 1;
-        }
-
-        .task-text:hover:not(.editing) {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-
-        .task-text.editing {
-            background-color: var(--background-color);
-            border: 1px solid var(--primary-color);
-            padding: 1px 4px;
-            outline: none;
-        }
-
-        .priority-tag {
-            font-size: 0.75em;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 6px;
-            white-space: nowrap;
-            color: #1A1A1A;
-        }
-
-        .priority-low { background-color: var(--priority-low); }
-        .priority-medium { background-color: var(--priority-medium); }
-        .priority-high { background-color: var(--priority-high); }
-        
-        .expected-time {
-            font-size: 0.8em;
-            font-weight: 600;
-            color: var(--secondary-color);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            background-color: var(--background-color);
-            padding: 4px 8px;
-            border-radius: 6px;
-            white-space: nowrap;
-        }
-
-        .task-actions {
-            display: flex;
-            gap: 6px;
-            margin-top: 5px;
-        }
-
-        .task-actions button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1em;
-            padding: 6px;
-            border-radius: 50%;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: none;
-        }
-        
-        .task-actions button i {
-            pointer-events: none;
-        }
-
-        .task-actions .complete-btn { color: var(--success-color); }
-        .task-actions .complete-btn:hover { background-color: rgba(46, 204, 113, 0.2); }
-        .task-actions .edit-btn { color: var(--info-color); }
-        .task-actions .edit-btn:hover { background-color: rgba(52, 152, 219, 0.2); }
-        .task-actions .delete-btn { color: var(--danger-color); }
-        .task-actions .delete-btn:hover { background-color: rgba(255, 99, 71, 0.2); }
-
-        .bulk-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 20px;
-        }
-
-        .bulk-actions button {
-            background-color: var(--danger-color);
-            color: #1A1A1A;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9em;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            box-shadow: 0 0 5px var(--danger-color);
-        }
-
-        .bulk-actions button:hover {
-            background-color: #D34C38;
-            transform: translateY(-1px);
-            box-shadow: 0 0 10px var(--danger-color);
-        }
-
-        .feedback-message {
-            color: var(--danger-color);
-            font-size: 0.9em;
-            margin-top: 5px;
-            text-align: center;
-            visibility: hidden;
-            opacity: 0;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-            min-height: 20px;
-        }
-
-        .feedback-message.show {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .feedback-message.success {
-            color: var(--success-color);
-        }
-        
-        /*
-         * Seção: Estilos do Modal (Alerts e Confirmações)
-         * Descrição: Estilos para o modal personalizado.
-         */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            visibility: hidden;
-            opacity: 0;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-        
-        .modal-overlay.show {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .modal-content {
-            background-color: var(--surface-color);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 215, 0, 0.3);
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-            transform: translateY(-20px);
-            transition: transform 0.3s ease;
-            border: 1px solid var(--primary-color);
-        }
-
-        .modal-overlay.show .modal-content {
-            transform: translateY(0);
-        }
-
-        .modal-content h3 {
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            font-size: 1.5em;
-            text-shadow: 0 0 5px var(--primary-color);
-        }
-        
-        .modal-content p {
-            margin-bottom: 30px;
-            color: var(--secondary-color);
             font-size: 1.1em;
-        }
-        
-        .modal-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .modal-buttons button {
-            padding: 10px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
             font-weight: 600;
             transition: all 0.2s ease;
-            box-shadow: 0 0 5px var(--border-color);
+            margin: 0 5px;
         }
 
-        .modal-buttons .modal-confirm-btn {
+        #startPauseBtn {
+            background-color: var(--primary-color);
+            color: #1A1A1A;
+        }
+
+        #startPauseBtn:hover {
+            background-color: var(--primary-color-hover);
+            transform: translateY(-2px);
+        }
+
+        #stopBtn {
             background-color: var(--danger-color);
-            color: var(--background-color);
-        }
-        
-        .modal-buttons .modal-confirm-btn:hover {
-            background-color: #C53030;
-            transform: translateY(-1px);
-        }
-
-        .modal-buttons .modal-cancel-btn {
-            background-color: var(--border-color);
             color: var(--text-color);
         }
-        
-        .modal-buttons .modal-cancel-btn:hover {
-            background-color: #888;
-            transform: translateY(-1px);
+
+        #stopBtn:hover {
+            background-color: var(--danger-color-hover);
+            transform: translateY(-2px);
         }
         
-        .generated-tasks-list {
-            list-style: none;
-            padding: 0;
-            text-align: left;
-            margin-bottom: 20px;
-        }
-        
-        .generated-tasks-list li {
-            background-color: var(--background-color);
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        #stopBtn:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+            transform: none;
         }
 
-        /*
-         * Seção: Estilos do Histórico de Estudos
-         * Descrição: Estilos para a seção que armazena as sessões concluídas.
-         */
+        /* Seção: Estilos do Histórico */
         .history-section {
-            margin-top: 40px;
             border-top: 1px solid var(--border-color);
             padding-top: 20px;
+            margin-top: 30px;
         }
 
-        .history-section h2 {
-            text-align: center;
-            color: var(--secondary-color);
-            margin-bottom: 20px;
+        h2 {
+            color: var(--text-color);
             font-size: 1.5em;
+            margin-bottom: 20px;
         }
 
-        .history-list {
+        #historyList {
             list-style: none;
             padding: 0;
             margin: 0;
+            max-height: 250px;
+            overflow-y: auto;
+            text-align: left;
         }
 
-        .history-list li {
-            background-color: var(--surface-color);
+        #historyList li {
+            background-color: var(--background-color);
             border-radius: 8px;
-            padding: 10px 15px;
-            margin-bottom: 8px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.95em;
-            box-shadow: none;
-            border-left: 4px solid;
-            transition: background-color 0.2s ease;
-        }
-        
-        .history-list li:hover {
-            background-color: #2A2A2A;
-        }
-
-        .history-list li:last-child {
-            margin-bottom: 0;
-        }
-
-        .history-list .history-study {
-            border-left-color: var(--primary-color);
-        }
-
-        .history-list .history-break {
-            border-left-color: var(--info-color);
-        }
-
-        .history-list .history-info {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        /*
-         * Seção: Estilos do Rodapé e Link do LinkedIn
-         * Descrição: Estilos para a frase motivacional e o link de perfil.
-         */
-        .footer-container {
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        .motivational-quote {
-            padding: 20px;
-            background-color: var(--background-color);
-            color: var(--secondary-color);
-            border-radius: 12px;
-            font-style: italic;
             font-size: 1em;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            position: relative;
-            border: 1px solid var(--border-color);
+        }
+        
+        .session-info {
+            flex-grow: 1;
+            padding-right: 15px;
+            word-break: break-word;
         }
 
-        .motivational-quote p {
-            margin: 0;
-            line-height: 1.5;
-        }
-        
-        .motivational-quote .generate-quote-btn {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(255, 255, 255, 0.05);
-            border: none;
-            border-radius: 50%;
-            padding: 5px;
-            color: var(--primary-color);
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            box-shadow: 0 0 3px var(--primary-color);
-        }
-        
-        .motivational-quote .generate-quote-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        .linkedin-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--primary-color);
-            text-decoration: none;
+        #historyList li .topic {
             font-weight: 600;
-            padding: 8px 12px;
-            border-radius: 8px;
-            transition: background-color 0.2s ease;
         }
         
-        .linkedin-link:hover {
-            background-color: var(--surface-color);
-            box-shadow: 0 0 8px var(--primary-color), 0 0 15px rgba(255, 215, 0, 0.4);
+        #historyList li .duration {
+            font-weight: 400;
+            color: var(--primary-color);
+            white-space: nowrap;
+            display: block; /* Garante que fique abaixo do tópico */
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+        
+        /* NOVO: Estilo para o botão de deletar */
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--border-color);
+            cursor: pointer;
+            font-size: 1.5em;
+            line-height: 1;
+            padding: 0 5px;
+            font-weight: bold;
+            opacity: 0.3;
+            transition: opacity 0.2s ease, color 0.2s ease;
         }
 
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 4px solid var(--primary-color);
-            width: 30px;
-            height: 30px;
-            -webkit-animation: spin 2s linear infinite;
-            animation: spin 2s linear infinite;
-            margin: 20px auto;
+        #historyList li:hover .delete-btn {
+            opacity: 1; /* Mostra o botão ao passar o mouse no item da lista */
         }
 
-        @-webkit-keyframes spin {
-            0% { -webkit-transform: rotate(0deg); }
-            100% { -webkit-transform: rotate(360deg); }
+        .delete-btn:hover {
+            color: var(--danger-color);
+        }
+        
+        /* Estilo para a barra de rolagem do histórico */
+        #historyList::-webkit-scrollbar { width: 8px; }
+        #historyList::-webkit-scrollbar-track { background: var(--surface-color); border-radius: 4px; }
+        #historyList::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 4px; }
+        #historyList::-webkit-scrollbar-thumb:hover { background-color: #555; }
+
+        /* Estilo para a notificação */
+        #notification {
+            position: absolute;
+            bottom: -50px; /* Começa fora da tela */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--success-color);
+            color: var(--background-color);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: bottom 0.5s ease-in-out;
+            visibility: hidden;
+            z-index: 10;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        #notification.show {
+            bottom: 20px;
+            visibility: visible;
         }
 
-        /*
-         * Seção: Responsividade
-         * Descrição: Ajusta o layout para diferentes tamanhos de tela.
-         */
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-                margin: 10px;
-            }
-
-            h1 {
-                font-size: 1.8em;
-                margin-bottom: 20px;
-            }
-
-            .add-task-section {
-                flex-direction: column;
-            }
-
-            .add-task-section input[type="text"],
-            .add-task-section select,
-            .add-task-section button,
-            .add-task-section .time-input-group {
-                width: 100%;
-            }
-            
-            .add-task-buttons {
-                flex-direction: column;
-            }
-
-            .controls-section {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .filter-buttons {
-                display: flex;
-                justify-content: space-around;
-                width: 100%;
-                margin-top: 10px;
-            }
-
-            .filter-buttons button {
-                flex: 1;
-                padding: 8px 10px;
-                font-size: 0.85em;
-            }
-
-            .task-list li {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 15px;
-            }
-
-            .task-content {
-                margin-right: 0;
-                margin-bottom: 10px;
-                width: 100%;
-            }
-
-            .task-actions {
-                width: 100%;
-                justify-content: flex-end;
-            }
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Relógio Inteligente de Estudos</h1>
+        <h1>Relógio de Foco</h1>
 
-        <!-- Seção do Timer (Pomodoro) -->
-        <div class="pomodoro-timer">
-            <h3>Defina Metas de Tempo Claras!</h3>
-            <p>Conquiste grandes resultados com sessões de foco e pausas estratégicas.</p>
-            <div class="timer-config">
-                <label for="studyTime">Estudo (min):</label>
-                <input type="number" id="studyTimeInput" value="25" min="1" max="90">
-                <label for="breakTime">Descanso (min):</label>
-                <input type="number" id="breakTimeInput" value="5" min="1" max="30">
+        <!-- Seção do Temporizador -->
+        <div class="timer-section">
+            <input type="text" id="studyTopicInput" placeholder="O que você vai estudar agora?">
+            <div class="time-inputs">
+                <input type="number" id="minutesInput" value="25" min="0" max="180" placeholder="Min">
+                <span>:</span>
+                <input type="number" id="secondsInput" value="0" min="0" max="59" placeholder="Seg">
             </div>
-            <div id="timerDisplay" class="timer-display">25:00</div>
+            <div id="timerDisplay">25:00</div>
             <div class="timer-controls">
-                <button id="startTimerBtn">
-                    <i class="ph ph-play-circle" style="font-size: 1.2em;"></i> Iniciar
-                </button>
-                <button id="pauseTimerBtn" style="display: none;">
-                    <i class="ph ph-pause-circle" style="font-size: 1.2em;"></i> Pausar
-                </button>
-                <button id="resetTimerBtn">
-                    <i class="ph ph-arrow-counter-clockwise" style="font-size: 1.2em;"></i> Resetar
-                </button>
+                <button id="startPauseBtn">Iniciar</button>
+                <button id="stopBtn" disabled>Finalizar e Salvar</button>
             </div>
         </div>
-        
-        <div id="mainContent">
-            <!-- Seção para Adicionar Novas Tarefas -->
-            <div class="add-task-section">
-                <input type="text" id="newTaskInput" placeholder="Adicionar nova tarefa...">
-                <select id="prioritySelect">
-                    <option value="Baixa">Prioridade: Baixa</option>
-                    <option value="Média">Prioridade: Média</option>
-                    <option value="Alta">Prioridade: Alta</option>
-                </select>
-                <div class="time-input-group">
-                    <label for="expectedTimeInput">Tempo (min):</label>
-                    <input type="number" id="expectedTimeInput" value="30" min="1" max="180">
-                </div>
-                <div class="add-task-buttons">
-                    <button id="addTaskBtn">Adicionar</button>
-                    <button id="generateTasksBtn" class="generate-btn">Gerar Tarefas ✨</button>
-                </div>
-                <p id="feedbackMessage" class="feedback-message"></p>
-            </div>
 
-            <!-- Seção de Filtros e Pesquisa -->
-            <div class="controls-section">
-                <input type="text" id="searchInput" placeholder="Pesquisar tarefas...">
-                <div class="filter-buttons">
-                    <button id="filterAllBtn" class="active">Todas</button>
-                    <button id="filterPendingBtn">Pendentes</button>
-                    <button id="filterCompletedBtn">Concluídas</button>
-                </div>
-            </div>
-
-            <!-- Lista de Tarefas Pendentes e Concluídas -->
-            <ul id="taskList" class="task-list">
-                <!-- Tarefas serão adicionadas aqui via JavaScript -->
+        <!-- Seção do Histórico -->
+        <div class="history-section">
+            <h2>Histórico de Estudos</h2>
+            <ul id="historyList">
+                <!-- Registros de estudo serão inseridos aqui -->
             </ul>
-
-            <!-- Ações em Massa (Ex: Limpar tarefas concluídas) -->
-            <div class="bulk-actions">
-                <button id="clearCompletedBtn">Limpar Concluídas</button>
-            </div>
-
-            <!-- Seção de Histórico de Estudos -->
-            <div class="history-section">
-                <h2>Histórico de Sessões</h2>
-                <ul id="historyList" class="history-list">
-                    <!-- Sessões concluídas serão adicionadas aqui via JavaScript -->
-                </ul>
-            </div>
         </div>
-        
-        <!-- Rodapé com Frase Motivacional e Link do LinkedIn -->
-        <div class="footer-container">
-            <div class="motivational-quote">
-                <p id="quoteText">Carregando frase motivacional...</p>
-                <button id="generateQuoteBtn" class="generate-quote-btn" title="Gerar nova frase motivacional">
-                    <i class="ph ph-sparkle" style="font-size: 1.2em;"></i>
-                </button>
-            </div>
-            <a href="https://www.linkedin.com/in/jo%C3%A3o-marcos-souza-pereira-38750a289/" target="_blank" class="linkedin-link">
-                <i class="ph ph-linkedin-logo" style="font-size: 1.5em;"></i>
-                <span>Visite meu LinkedIn</span>
-            </a>
-        </div>
+
+        <div id="notification"></div>
     </div>
 
-    <!-- Modal Customizado para Confirmações e Alertas -->
-    <div id="customModal" class="modal-overlay">
-        <div class="modal-content">
-            <h3 id="modalTitle"></h3>
-            <p id="modalMessage"></p>
-            <div class="modal-buttons">
-                <button id="modalConfirmBtn" class="modal-confirm-btn">Confirmar</button>
-                <button id="modalCancelBtn" class="modal-cancel-btn">Cancelar</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modal para Tarefas Geradas por IA -->
-    <div id="generatedTasksModal" class="modal-overlay">
-        <div class="modal-content">
-            <h3 id="generatedTasksTitle"></h3>
-            <div id="generatedTasksContent">
-                <div class="loader"></div>
-            </div>
-            <div id="generatedTasksActions" class="modal-buttons" style="display: none;">
-                <button id="addGeneratedTasksBtn" class="modal-confirm-btn" style="background-color: var(--primary-color);">Adicionar Todas</button>
-                <button id="cancelGeneratedTasksBtn" class="modal-cancel-btn">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Lógica da Aplicação (JavaScript) -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Referências aos elementos do DOM para evitar repetição
-            const dom = {
-                newTaskInput: document.getElementById('newTaskInput'),
-                prioritySelect: document.getElementById('prioritySelect'),
-                expectedTimeInput: document.getElementById('expectedTimeInput'),
-                addTaskBtn: document.getElementById('addTaskBtn'),
-                generateTasksBtn: document.getElementById('generateTasksBtn'),
-                taskList: document.getElementById('taskList'),
-                feedbackMessage: document.getElementById('feedbackMessage'),
-                searchInput: document.getElementById('searchInput'),
-                filterAllBtn: document.getElementById('filterAllBtn'),
-                filterPendingBtn: document.getElementById('filterPendingBtn'),
-                filterCompletedBtn: document.getElementById('filterCompletedBtn'),
-                clearCompletedBtn: document.getElementById('clearCompletedBtn'),
-                quoteText: document.getElementById('quoteText'),
-                generateQuoteBtn: document.getElementById('generateQuoteBtn'),
-                timerDisplay: document.getElementById('timerDisplay'),
-                studyTimeInput: document.getElementById('studyTimeInput'),
-                breakTimeInput: document.getElementById('breakTimeInput'),
-                startTimerBtn: document.getElementById('startTimerBtn'),
-                pauseTimerBtn: document.getElementById('pauseTimerBtn'),
-                resetTimerBtn: document.getElementById('resetTimerBtn'),
-                historyList: document.getElementById('historyList'),
-                customModal: document.getElementById('customModal'),
-                modalTitle: document.getElementById('modalTitle'),
-                modalMessage: document.getElementById('modalMessage'),
-                modalConfirmBtn: document.getElementById('modalConfirmBtn'),
-                modalCancelBtn: document.getElementById('modalCancelBtn'),
-                generatedTasksModal: document.getElementById('generatedTasksModal'),
-                generatedTasksTitle: document.getElementById('generatedTasksTitle'),
-                generatedTasksContent: document.getElementById('generatedTasksContent'),
-                generatedTasksActions: document.getElementById('generatedTasksActions'),
-                addGeneratedTasksBtn: document.getElementById('addGeneratedTasksBtn'),
-                cancelGeneratedTasksBtn: document.getElementById('cancelGeneratedTasksBtn'),
-            };
-            
-            // Variáveis de estado global
-            let tasks = [];
-            let generatedTasks = []; // Novo array para armazenar tarefas geradas
-            let currentFilter = 'all';
-            let currentSearchTerm = '';
-            let timerInterval;
-            let totalSeconds;
-            let isPaused = true;
-            let isStudySession = true;
-            let history = [];
+            // Referências aos elementos do DOM
+            const topicInput = document.getElementById('studyTopicInput');
+            const minutesInput = document.getElementById('minutesInput');
+            const secondsInput = document.getElementById('secondsInput');
+            const timerDisplay = document.getElementById('timerDisplay');
+            const startPauseBtn = document.getElementById('startPauseBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const historyList = document.getElementById('historyList');
+            const notification = document.getElementById('notification');
 
-            // Frases motivacionais para a JM Analytics (agora apenas fallback)
-            const motivationalQuotes = [
-                "A excelência é um hábito, não um ato. Continue construindo!",
-                "Cada tarefa concluída é um passo em direção ao sucesso da JM Analytics.",
-                "Transforme dados em decisões, e tarefas em conquistas.",
-                "O futuro é construído com as ações de hoje. Mãos à obra!",
-                "Sua produtividade é o motor da inovação na JM Analytics.",
-                "Organização é a chave para desbloquear seu potencial máximo."
-            ];
+            // Variáveis de estado
+            let timerInterval = null;
+            let totalDurationInSeconds = 0;
+            let timeRemainingInSeconds = 0;
+            let isRunning = false;
+            let studyHistory = [];
 
-            //
-            // Funções de Integração com a API do Gemini
-            //
+            /**
+             * Formata o tempo de segundos para o formato MM:SS.
+             */
+            function formatTime(totalSeconds) {
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = totalSeconds % 60;
+                return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
             
             /**
-             * Faz uma chamada à API do Gemini para gerar sub-tarefas.
-             * @param {string} taskText - A tarefa principal a ser dividida.
-             * @returns {Promise<string[]>} Uma promessa com a lista de sub-tarefas.
+             * Formata o tempo de segundos para o formato HH:MM:SS para o histórico.
              */
-            async function getGeneratedSubtasks(taskText) {
-                const prompt = `Gere uma lista de 3 a 5 sub-tarefas curtas e práticas para a tarefa principal: '${taskText}'. As sub-tarefas devem ser acionáveis e diretas, com o objetivo de quebrar a tarefa grande em partes menores para um plano de estudos. Responda apenas com uma lista de strings em formato JSON, onde cada string é uma sub-tarefa.`;
-                const payload = {
-                    contents: [{ role: "user", parts: [{ text: prompt }] }],
-                    generationConfig: {
-                        responseMimeType: "application/json",
-                        responseSchema: {
-                            type: "ARRAY",
-                            items: { type: "STRING" }
-                        }
-                    }
-                };
-
-                const apiKey = ""; // A chave será fornecida pelo ambiente
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-                // Implementa a lógica de backoff exponencial
-                let retries = 0;
-                const maxRetries = 5;
-                while (retries < maxRetries) {
-                    try {
-                        const response = await fetch(apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        const result = await response.json();
-                        if (result.candidates && result.candidates.length > 0 && result.candidates[0].content) {
-                            return JSON.parse(result.candidates[0].content.parts[0].text);
-                        }
-                    } catch (error) {
-                        console.error(`Erro ao chamar a API (tentativa ${retries + 1}):`, error);
-                        retries++;
-                        const delay = Math.pow(2, retries) * 1000;
-                        await new Promise(res => setTimeout(res, delay));
-                    }
-                }
-                throw new Error('Falha ao gerar sub-tarefas após várias tentativas.');
+            function formatHistoryTime(totalSeconds) {
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                return [hours, minutes, seconds].map(val => String(val).padStart(2, '0')).join(':');
             }
 
             /**
-             * Faz uma chamada à API do Gemini para gerar uma frase motivacional.
-             * @returns {Promise<string>} Uma promessa com a frase motivacional.
+             * Mostra uma notificação na tela.
              */
-            async function getGeneratedQuote() {
-                const prompt = "Gere uma única frase motivacional curta e inspiradora para estudantes, com no máximo 15 palavras. A frase deve ser otimista e focar na produtividade e no crescimento. Responda apenas com a frase.";
-                const payload = {
-                    contents: [{ role: "user", parts: [{ text: prompt }] }]
-                };
-                
-                const apiKey = ""; // A chave será fornecida pelo ambiente
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-                let retries = 0;
-                const maxRetries = 5;
-                while (retries < maxRetries) {
-                    try {
-                        const response = await fetch(apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        const result = await response.json();
-                        if (result.candidates && result.candidates.length > 0 && result.candidates[0].content) {
-                            return result.candidates[0].content.parts[0].text.trim().replace(/^"|"$/g, '');
-                        }
-                    } catch (error) {
-                        console.error(`Erro ao chamar a API (tentativa ${retries + 1}):`, error);
-                        retries++;
-                        const delay = Math.pow(2, retries) * 1000;
-                        await new Promise(res => setTimeout(res, delay));
-                    }
-                }
-                // Retorna uma frase padrão em caso de falha
-                return "O sucesso é a soma de pequenos esforços repetidos diariamente.";
-            }
-
-            //
-            // Funções Utilitárias e de Feedback
-            //
-
-            /**
-             * Exibe uma mensagem de feedback na tela por 3 segundos.
-             * @param {string} message - A mensagem a ser exibida.
-             * @param {boolean} isSuccess - Se true, exibe mensagem de sucesso, caso contrário, de erro.
-             */
-            function showFeedbackMessage(message, isSuccess = false) {
-                dom.feedbackMessage.textContent = message;
-                dom.feedbackMessage.classList.remove('success', 'danger');
-                dom.feedbackMessage.classList.add(isSuccess ? 'success' : 'danger');
-                dom.feedbackMessage.classList.add('show');
+            function showNotification(message) {
+                notification.textContent = message;
+                notification.classList.add('show');
                 setTimeout(() => {
-                    dom.feedbackMessage.classList.remove('show');
+                    notification.classList.remove('show');
                 }, 3000);
             }
 
             /**
-             * Exibe o modal customizado para confirmações ou mensagens, substituindo `window.alert` e `window.confirm`.
-             * @param {string} title - Título do modal.
-             * @param {string} message - Mensagem principal do modal.
-             * @param {boolean} isConfirmation - Se true, exibe botões de confirmação/cancelamento.
-             * @returns {Promise<boolean>} Promessa que resolve para `true` se confirmado, `false` se cancelado.
+             * Atualiza o display do timer a cada segundo (contagem regressiva).
              */
-            function showCustomModal(title, message, isConfirmation = false) {
-                return new Promise((resolve) => {
-                    dom.modalTitle.textContent = title;
-                    dom.modalMessage.textContent = message;
-                    
-                    // Oculta os botões do modal padrão antes de mostrar
-                    dom.modalConfirmBtn.style.display = 'none';
-                    dom.modalCancelBtn.style.display = 'none';
+            function tick() {
+                timeRemainingInSeconds--;
+                timerDisplay.textContent = formatTime(timeRemainingInSeconds);
+                document.title = `${formatTime(timeRemainingInSeconds)} - Foco`;
 
-                    if (isConfirmation) {
-                        dom.modalConfirmBtn.style.display = 'inline-block';
-                        dom.modalCancelBtn.style.display = 'inline-block';
+                if (timeRemainingInSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    document.title = "Relógio de Foco";
+                    showNotification("Tempo esgotado! Sessão salva.");
+                    stopAndLogTimer(true); // O true indica que a sessão terminou naturalmente
+                }
+            }
+
+            /**
+             * Inicia ou pausa o temporizador.
+             */
+            function toggleTimer() {
+                if (isRunning) {
+                    // Pausa o timer
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    startPauseBtn.textContent = 'Continuar';
+                } else {
+                    // Inicia ou continua o timer
+                    if (timeRemainingInSeconds === 0) { // Se está começando do zero
+                        const minutes = parseInt(minutesInput.value) || 0;
+                        const seconds = parseInt(secondsInput.value) || 0;
+                        totalDurationInSeconds = (minutes * 60) + seconds;
+                        timeRemainingInSeconds = totalDurationInSeconds;
+                    }
+                    
+                    if (timeRemainingInSeconds <= 0) {
+                        showNotification('Por favor, defina um tempo de estudo.');
+                        return;
                     }
 
-                    dom.customModal.classList.add('show');
-
-                    const handleConfirm = () => {
-                        dom.customModal.classList.remove('show');
-                        dom.modalConfirmBtn.removeEventListener('click', handleConfirm);
-                        dom.modalCancelBtn.removeEventListener('click', handleCancel);
-                        resolve(true);
-                    };
-
-                    const handleCancel = () => {
-                        dom.customModal.classList.remove('show');
-                        dom.modalConfirmBtn.removeEventListener('click', handleConfirm);
-                        dom.modalCancelBtn.removeEventListener('click', handleCancel);
-                        resolve(false);
-                    };
-
-                    dom.modalConfirmBtn.addEventListener('click', handleConfirm);
-                    dom.modalCancelBtn.addEventListener('click', handleCancel);
-                });
+                    const topic = topicInput.value.trim();
+                    if (topic === '') {
+                        showNotification('Defina um tópico de estudo antes de iniciar.');
+                        return;
+                    }
+                    
+                    isRunning = true;
+                    startPauseBtn.textContent = 'Pausar';
+                    stopBtn.disabled = false;
+                    topicInput.disabled = true;
+                    minutesInput.disabled = true;
+                    secondsInput.disabled = true;
+                    timerInterval = setInterval(tick, 1000);
+                }
             }
             
             /**
-             * Exibe o modal para as tarefas geradas pela IA.
-             * @param {string} title - Título do modal.
-             * @param {string[]} tasks - Array de strings com as tarefas geradas.
+             * Para o temporizador, salva a sessão e reseta o estado.
+             * @param {boolean} finishedNaturally - Indica se o timer chegou a zero.
              */
-            function showGeneratedTasksModal(title, tasks) {
-                dom.generatedTasksTitle.textContent = title;
-                dom.generatedTasksContent.innerHTML = '';
-                dom.generatedTasksActions.style.display = 'flex';
-                
-                const taskListUl = document.createElement('ul');
-                taskListUl.classList.add('generated-tasks-list');
-                
-                tasks.forEach(task => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<input type="checkbox" checked> <span>${task}</span>`;
-                    taskListUl.appendChild(li);
-                });
-                dom.generatedTasksContent.appendChild(taskListUl);
-                dom.generatedTasksModal.classList.add('show');
-            }
+            function stopAndLogTimer(finishedNaturally = false) {
+                clearInterval(timerInterval);
+                isRunning = false;
 
-            //
-            // Funções de Persistência de Dados (localStorage)
-            //
+                const studiedSeconds = finishedNaturally ? totalDurationInSeconds : totalDurationInSeconds - timeRemainingInSeconds;
+
+                if (studiedSeconds > 0) {
+                    const session = {
+                        topic: topicInput.value.trim() || 'Sessão sem tópico',
+                        duration: formatHistoryTime(studiedSeconds),
+                        date: new Date().toISOString() // Usado como ID único
+                    };
+                    studyHistory.unshift(session);
+                    saveHistory();
+                    renderHistory();
+                }
+
+                // Reseta o estado
+                timeRemainingInSeconds = 0;
+                totalDurationInSeconds = 0;
+                updateDisplayFromInputs(); 
+                startPauseBtn.textContent = 'Iniciar';
+                stopBtn.disabled = true;
+                topicInput.value = '';
+                topicInput.disabled = false;
+                minutesInput.disabled = false;
+                secondsInput.disabled = false;
+                document.title = "Relógio de Foco";
+            }
             
             /**
-             * Carrega as tarefas e o histórico do localStorage.
-             */
-            function loadData() {
-                const storedTasks = localStorage.getItem('jmAnalyticsTasks');
-                if (storedTasks) {
-                    tasks = JSON.parse(storedTasks);
-                }
-
-                const storedHistory = localStorage.getItem('jmAnalyticsHistory');
-                if (storedHistory) {
-                    history = JSON.parse(storedHistory);
-                }
+            * Atualiza o timerDisplay com base nos valores dos inputs.
+            */
+            function updateDisplayFromInputs() {
+                const minutes = parseInt(minutesInput.value) || 0;
+                const seconds = parseInt(secondsInput.value) || 0;
+                const totalSeconds = (minutes * 60) + seconds;
+                timerDisplay.textContent = formatTime(totalSeconds);
             }
 
             /**
-             * Salva as tarefas e o histórico no localStorage.
-             */
-            function saveData() {
-                localStorage.setItem('jmAnalyticsTasks', JSON.stringify(tasks));
-                localStorage.setItem('jmAnalyticsHistory', JSON.stringify(history));
-            }
-
-            //
-            // Funções de Renderização
-            //
-
-            /**
-             * Renderiza as tarefas na tela, aplicando filtros e pesquisa.
-             */
-            function renderTasks() {
-                dom.taskList.innerHTML = ''; // Limpa a lista antes de renderizar
-
-                let filteredTasks = tasks.filter(task => {
-                    // Lógica de filtro por status
-                    if (currentFilter === 'pending' && task.completed) return false;
-                    if (currentFilter === 'completed' && !task.completed) return false;
-                    // Lógica de filtro por termo de pesquisa
-                    if (currentSearchTerm && !task.text.toLowerCase().includes(currentSearchTerm.toLowerCase())) {
-                        return false;
-                    }
-                    return true;
-                });
-
-                if (filteredTasks.length === 0) {
-                    const noTasksMessage = document.createElement('li');
-                    noTasksMessage.textContent = currentSearchTerm ? "Nenhuma tarefa encontrada." : "Nenhuma tarefa adicionada ainda.";
-                    // Atribui estilos diretamente para evitar classes CSS complexas para um único elemento
-                    Object.assign(noTasksMessage.style, {
-                        textAlign: "center", fontStyle: "italic", color: "var(--text-color)",
-                        backgroundColor: "transparent", border: "none"
-                    });
-                    dom.taskList.appendChild(noTasksMessage);
-                    return;
-                }
-
-                filteredTasks.forEach(task => {
-                    const listItem = document.createElement('li');
-                    if (task.completed) listItem.classList.add('completed');
-
-                    // Cria os elementos da tarefa
-                    const taskTextSpan = document.createElement('span');
-                    taskTextSpan.classList.add('task-text');
-                    taskTextSpan.textContent = task.text;
-                    taskTextSpan.contentEditable = false;
-                    taskTextSpan.dataset.id = task.id;
-
-                    const priorityTag = document.createElement('span');
-                    priorityTag.classList.add('priority-tag', `priority-${task.priority.toLowerCase()}`);
-                    priorityTag.textContent = task.priority;
-                    
-                    const expectedTimeTag = document.createElement('span');
-                    expectedTimeTag.classList.add('expected-time');
-                    expectedTimeTag.innerHTML = `<i class="ph ph-clock" style="font-size: 1.1em;"></i> ${task.expectedTime} min`;
-
-                    // Estrutura o HTML interno da tarefa
-                    listItem.innerHTML = `
-                        <div class="task-content"></div>
-                        <div class="task-actions">
-                            <button class="complete-btn" data-id="${task.id}" title="Marcar como Concluído"><i class="ph ph-check"></i></button>
-                            <button class="edit-btn" data-id="${task.id}" title="Editar Tarefa"><i class="ph ph-pencil"></i></button>
-                            <button class="delete-btn" data-id="${task.id}" title="Excluir Tarefa"><i class="ph ph-trash"></i></button>
-                        </div>
-                    `;
-                    const taskContentDiv = listItem.querySelector('.task-content');
-                    taskContentDiv.appendChild(taskTextSpan);
-                    taskContentDiv.appendChild(priorityTag);
-                    taskContentDiv.appendChild(expectedTimeTag);
-
-                    dom.taskList.appendChild(listItem);
-                });
-            }
-
-            /**
-             * Renderiza o histórico de sessões na tela.
+             * Renderiza a lista de histórico na tela.
              */
             function renderHistory() {
-                dom.historyList.innerHTML = '';
-                if (history.length === 0) {
-                    const noHistoryMessage = document.createElement('li');
-                    noHistoryMessage.textContent = "Nenhuma sessão registrada ainda.";
-                    Object.assign(noHistoryMessage.style, {
-                        textAlign: "center", fontStyle: "italic", backgroundColor: "transparent", border: "none"
-                    });
-                    dom.historyList.appendChild(noHistoryMessage);
+                historyList.innerHTML = '';
+                if (studyHistory.length === 0) {
+                    const emptyMessage = document.createElement('li');
+                    emptyMessage.textContent = 'Nenhuma sessão registrada.';
+                    emptyMessage.style.textAlign = 'center';
+                    emptyMessage.style.color = '#888';
+                    historyList.appendChild(emptyMessage);
                     return;
                 }
-
-                history.forEach(session => {
-                    const listItem = document.createElement('li');
-                    listItem.classList.add(`history-${session.type.toLowerCase()}`);
-                    listItem.innerHTML = `
-                        <div class="history-info">
-                            <span>**${session.type}**</span>
-                            <small>${session.date}</small>
+                studyHistory.forEach(session => {
+                    const li = document.createElement('li');
+                    // NOVO: Adiciona o botão de deletar com um data-id único
+                    li.innerHTML = `
+                        <div class="session-info">
+                            <span class="topic">${session.topic}</span>
+                            <span class="duration">${session.duration}</span>
                         </div>
-                        <span>${session.duration} min</span>
+                        <button class="delete-btn" data-id="${session.date}" title="Excluir registro">&times;</button>
                     `;
-                    dom.historyList.appendChild(listItem);
+                    historyList.appendChild(li);
                 });
             }
-
-            /**
-             * Exibe uma frase motivacional aleatória.
-             */
-            async function displayMotivationalQuote() {
-                try {
-                    const quote = await getGeneratedQuote();
-                    dom.quoteText.textContent = quote;
-                } catch (e) {
-                    console.error(e);
-                    const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
-                    dom.quoteText.textContent = motivationalQuotes[randomIndex];
-                }
-            }
             
-            //
-            // Funções de Lógica da Aplicação (Tarefas)
-            //
-
+            // NOVO: Função para deletar uma sessão do histórico
             /**
-             * Adiciona uma nova tarefa à lista.
+             * Remove uma sessão do histórico com base no seu ID (data).
+             * @param {string} sessionId - O ID da sessão a ser removida.
              */
-            function addTask() {
-                const taskText = dom.newTaskInput.value.trim();
-                const taskPriority = dom.prioritySelect.value;
-                const expectedTime = parseInt(dom.expectedTimeInput.value);
-
-                if (taskText === '') {
-                    showFeedbackMessage('Por favor, digite uma tarefa!');
-                    dom.newTaskInput.focus();
-                    return;
-                }
-                
-                if (isNaN(expectedTime) || expectedTime <= 0) {
-                    showFeedbackMessage('Por favor, insira um tempo válido (maior que 0)!');
-                    dom.expectedTimeInput.focus();
-                    return;
-                }
-                
-                const newTask = {
-                    id: Date.now().toString(),
-                    text: taskText,
-                    completed: false,
-                    priority: taskPriority,
-                    expectedTime: expectedTime
-                };
-                tasks.push(newTask);
-                dom.newTaskInput.value = '';
-                dom.prioritySelect.value = 'Baixa';
-                dom.expectedTimeInput.value = '30';
-                saveData(); // Salva no localStorage
-                renderTasks(); // Atualiza a lista na tela
-                showFeedbackMessage('Tarefa adicionada com sucesso!', true);
-            }
-            
-            /**
-             * Lógica para gerar e exibir tarefas sugeridas pela IA.
-             */
-            async function generateTasks() {
-                const taskText = dom.newTaskInput.value.trim();
-                if (taskText === '') {
-                    showFeedbackMessage('Por favor, digite uma tarefa para gerar sub-tarefas!', false);
-                    return;
-                }
-                
-                dom.generatedTasksTitle.textContent = "Gerando tarefas...";
-                dom.generatedTasksContent.innerHTML = '<div class="loader"></div>';
-                dom.generatedTasksActions.style.display = 'none';
-                dom.generatedTasksModal.classList.add('show');
-                
-                try {
-                    generatedTasks = await getGeneratedSubtasks(taskText);
-                    dom.generatedTasksTitle.textContent = `Tarefas geradas para "${taskText}"`;
-                    dom.generatedTasksContent.innerHTML = '';
-                    
-                    const taskListUl = document.createElement('ul');
-                    taskListUl.classList.add('generated-tasks-list');
-                    
-                    generatedTasks.forEach(task => {
-                        const li = document.createElement('li');
-                        li.innerHTML = `<input type="checkbox" checked> <span>${task}</span>`;
-                        taskListUl.appendChild(li);
-                    });
-                    dom.generatedTasksContent.appendChild(taskListUl);
-                    dom.generatedTasksActions.style.display = 'flex';
-                    
-                } catch (error) {
-                    dom.generatedTasksTitle.textContent = "Erro ao gerar tarefas.";
-                    dom.generatedTasksContent.innerHTML = `<p>${error.message}</p>`;
-                    dom.generatedTasksActions.style.display = 'flex';
-                    dom.addGeneratedTasksBtn.style.display = 'none';
-                }
-            }
-            
-            /**
-             * Adiciona as tarefas selecionadas do modal para a lista principal.
-             */
-            function addGeneratedTasks() {
-                const tasksToAdd = Array.from(dom.generatedTasksContent.querySelectorAll('input:checked'))
-                                         .map(checkbox => checkbox.nextElementSibling.textContent);
-                
-                if (tasksToAdd.length === 0) {
-                    showFeedbackMessage('Nenhuma tarefa selecionada para adicionar.', false);
-                    return;
-                }
-
-                tasksToAdd.forEach(taskText => {
-                    const newTask = {
-                        id: Date.now().toString(),
-                        text: taskText,
-                        completed: false,
-                        priority: dom.prioritySelect.value,
-                        expectedTime: 30, // Valor padrão para tarefas geradas
-                    };
-                    tasks.push(newTask);
-                });
-                
-                saveData();
-                renderTasks();
-                dom.generatedTasksModal.classList.remove('show');
-                showFeedbackMessage(`${tasksToAdd.length} tarefas adicionadas com sucesso!`, true);
-            }
-
-            /**
-             * Alterna o status de conclusão de uma tarefa.
-             * @param {string} id - O ID da tarefa.
-             */
-            function toggleComplete(id) {
-                const taskIndex = tasks.findIndex(task => task.id === id);
-                if (taskIndex > -1) {
-                    tasks[taskIndex].completed = !tasks[taskIndex].completed;
-                    saveData();
-                    renderTasks();
-                    showFeedbackMessage('Status da tarefa atualizado!', true);
-                }
-            }
-
-            /**
-             * Inicia a edição de uma tarefa.
-             * @param {string} id - O ID da tarefa.
-             */
-            function startEditTask(id) {
-                const taskTextSpan = dom.taskList.querySelector(`.task-text[data-id="${id}"]`);
-                if (taskTextSpan) {
-                    taskTextSpan.contentEditable = true;
-                    taskTextSpan.classList.add('editing');
-                    taskTextSpan.focus();
-                    const range = document.createRange();
-                    range.selectNodeContents(taskTextSpan);
-                    const selection = window.getSelection();
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-
-                    // Salva ao perder o foco ou pressionar Enter
-                    taskTextSpan.addEventListener('blur', () => saveEditedTask(id, taskTextSpan), { once: true });
-                    taskTextSpan.addEventListener('keypress', (event) => {
-                        if (event.key === 'Enter') {
-                            event.preventDefault();
-                            taskTextSpan.blur();
-                        }
-                    }, { once: true });
-                }
-            }
-
-            /**
-             * Salva o texto editado de uma tarefa, validando se o novo texto não está vazio.
-             * @param {string} id - O ID da tarefa.
-             * @param {HTMLElement} taskTextSpan - O elemento span do texto da tarefa.
-             */
-            function saveEditedTask(id, taskTextSpan) {
-                taskTextSpan.contentEditable = false;
-                taskTextSpan.classList.remove('editing');
-                const newText = taskTextSpan.textContent.trim();
-                const taskIndex = tasks.findIndex(task => task.id === id);
-
-                if (taskIndex > -1 && newText !== '') {
-                    tasks[taskIndex].text = newText;
-                    saveData();
-                    renderTasks();
-                    showFeedbackMessage('Tarefa editada com sucesso!', true);
-                } else if (newText === '') {
-                    taskTextSpan.textContent = tasks[taskIndex].text; // Reverte o texto
-                    showFeedbackMessage('O texto da tarefa não pode ser vazio!', false);
-                    renderTasks();
-                }
-            }
-
-            /**
-             * Remove uma tarefa após confirmação do usuário.
-             * @param {string} id - O ID da tarefa.
-             */
-            async function deleteTask(id) {
-                const confirmed = await showCustomModal(
-                    'Confirmar Exclusão',
-                    'Tem certeza que deseja excluir esta tarefa?',
-                    true
-                );
-                if (confirmed) {
-                    tasks = tasks.filter(task => task.id !== id);
-                    saveData();
-                    renderTasks();
-                    showFeedbackMessage('Tarefa excluída com sucesso!', true);
-                }
-            }
-
-            /**
-             * Limpa todas as tarefas concluídas após confirmação do usuário.
-             */
-            async function clearCompletedTasks() {
-                const completedTasks = tasks.filter(task => task.completed);
-                if (completedTasks.length === 0) {
-                    showFeedbackMessage('Nenhuma tarefa concluída para limpar.', false);
-                    return;
-                }
-
-                const confirmed = await showCustomModal(
-                    'Limpar Tarefas Concluídas',
-                    'Tem certeza que deseja remover todas as tarefas concluídas? Esta ação é irreversível.',
-                    true
-                );
-                
-                if (confirmed) {
-                    const initialLength = tasks.length;
-                    tasks = tasks.filter(task => !task.completed);
-                    if (tasks.length < initialLength) {
-                        saveData();
-                        renderTasks();
-                        showFeedbackMessage('Tarefas concluídas limpas!', true);
-                    } else {
-                        showFeedbackMessage('Nenhuma tarefa concluída para limpar.', false);
-                    }
-                }
-            }
-
-            /**
-             * Define o filtro ativo e renderiza as tarefas.
-             * @param {string} filterType - O tipo de filtro ('all', 'pending', 'completed').
-             */
-            function setFilter(filterType) {
-                currentFilter = filterType;
-                dom.filterAllBtn.classList.remove('active');
-                dom.filterPendingBtn.classList.remove('active');
-                dom.filterCompletedBtn.classList.remove('active');
-                document.getElementById(`filter${filterType.charAt(0).toUpperCase() + filterType.slice(1)}Btn`).classList.add('active');
-                renderTasks();
-            }
-
-            //
-            // Funções de Lógica da Aplicação (Timer)
-            //
-
-            /**
-             * Converte segundos em formato MM:SS.
-             * @param {number} seconds - O número de segundos.
-             * @returns {string} O tempo formatado.
-             */
-            function formatTime(seconds) {
-                const minutes = Math.floor(seconds / 60);
-                const remainingSeconds = seconds % 60;
-                return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
-            }
-
-            /**
-             * Adiciona uma sessão ao histórico.
-             * @param {string} type - Tipo da sessão ('Estudo' ou 'Descanso').
-             * @param {number} duration - Duração da sessão em minutos.
-             */
-            function addSessionToHistory(type, duration) {
-                const session = {
-                    date: new Date().toLocaleDateString('pt-BR'),
-                    type: type,
-                    duration: duration,
-                };
-                history.push(session);
-                saveData();
+            function deleteSession(sessionId) {
+                studyHistory = studyHistory.filter(session => session.date !== sessionId);
+                saveHistory();
                 renderHistory();
+                showNotification('Sessão removida do histórico.');
             }
 
             /**
-             * Inicia o timer com a lógica de Pomodoro, alternando entre estudo e descanso.
+             * Salva o histórico no localStorage.
              */
-            function startTimer() {
-                if (!isPaused) return;
-                isPaused = false;
-                dom.startTimerBtn.style.display = 'none';
-                dom.pauseTimerBtn.style.display = 'inline-block';
+            function saveHistory() {
+                localStorage.setItem('studyFocusHistory', JSON.stringify(studyHistory));
+            }
 
-                if (totalSeconds === undefined) {
-                    totalSeconds = parseInt(dom.studyTimeInput.value) * 60;
-                    isStudySession = true;
+            /**
+             * Carrega o histórico do localStorage ao iniciar.
+             */
+            function loadHistory() {
+                const storedHistory = localStorage.getItem('studyFocusHistory');
+                if (storedHistory) {
+                    studyHistory = JSON.parse(storedHistory);
                 }
+            }
+
+            /**
+             * Função de inicialização da aplicação.
+             */
+            function init() {
+                startPauseBtn.addEventListener('click', toggleTimer);
+                stopBtn.addEventListener('click', () => stopAndLogTimer(false));
+                minutesInput.addEventListener('input', updateDisplayFromInputs);
+                secondsInput.addEventListener('input', updateDisplayFromInputs);
                 
-                timerInterval = setInterval(() => {
-                    if (totalSeconds > 0) {
-                        totalSeconds--;
-                        dom.timerDisplay.textContent = formatTime(totalSeconds);
-                    } else {
-                        clearInterval(timerInterval);
-                        if (isStudySession) {
-                            addSessionToHistory('Estudo', parseInt(dom.studyTimeInput.value));
-                            showCustomModal('Sessão de Estudo Concluída!', 'Hora de fazer uma pausa!');
-                            totalSeconds = parseInt(dom.breakTimeInput.value) * 60;
-                            isStudySession = false;
-                        } else {
-                            addSessionToHistory('Descanso', parseInt(dom.breakTimeInput.value));
-                            showCustomModal('Pausa Concluída!', 'Hora de voltar a estudar!');
-                            totalSeconds = parseInt(dom.studyTimeInput.value) * 60;
-                            isStudySession = true;
-                        }
-                        startTimer();
+                // NOVO: Listener de eventos na lista para delegação do clique de deletar
+                historyList.addEventListener('click', (event) => {
+                    if (event.target.classList.contains('delete-btn')) {
+                        const sessionId = event.target.dataset.id;
+                        deleteSession(sessionId);
                     }
-                }, 1000);
-            }
-            
-            /**
-             * Pausa o timer, limpando o intervalo.
-             */
-            function pauseTimer() {
-                isPaused = true;
-                clearInterval(timerInterval);
-                dom.startTimerBtn.style.display = 'inline-block';
-                dom.pauseTimerBtn.style.display = 'none';
-            }
+                });
 
-            /**
-             * Reseta o timer para o tempo de estudo inicial.
-             */
-            function resetTimer() {
-                pauseTimer();
-                isStudySession = true;
-                totalSeconds = parseInt(dom.studyTimeInput.value) * 60;
-                dom.timerDisplay.textContent = formatTime(totalSeconds);
-            }
-
-            /**
-             * Lógica de inicialização da aplicação e listeners de eventos.
-             */
-            function initApp() {
-                loadData();
-                renderTasks();
+                loadHistory();
                 renderHistory();
-                displayMotivationalQuote();
-                resetTimer();
-
-                dom.addTaskBtn.addEventListener('click', addTask);
-                dom.generateTasksBtn.addEventListener('click', generateTasks);
-                dom.addGeneratedTasksBtn.addEventListener('click', addGeneratedTasks);
-                dom.cancelGeneratedTasksBtn.addEventListener('click', () => dom.generatedTasksModal.classList.remove('show'));
-                dom.generateQuoteBtn.addEventListener('click', displayMotivationalQuote);
-
-                dom.newTaskInput.addEventListener('keypress', (event) => {
-                    if (event.key === 'Enter') addTask();
-                });
-
-                dom.taskList.addEventListener('click', (event) => {
-                    const target = event.target;
-                    const taskId = target.dataset.id || target.closest('button')?.dataset.id;
-                    if (!taskId) return;
-
-                    if (target.closest('.complete-btn')) toggleComplete(taskId);
-                    else if (target.closest('.edit-btn')) startEditTask(taskId);
-                    else if (target.closest('.delete-btn')) deleteTask(taskId);
-                    else if (target.classList.contains('task-text') && !target.classList.contains('editing')) {
-                        startEditTask(taskId);
-                    }
-                });
-
-                dom.searchInput.addEventListener('input', (event) => {
-                    currentSearchTerm = event.target.value.trim();
-                    renderTasks();
-                });
-
-                dom.filterAllBtn.addEventListener('click', () => setFilter('all'));
-                dom.filterPendingBtn.addEventListener('click', () => setFilter('pending'));
-                dom.filterCompletedBtn.addEventListener('click', () => setFilter('completed'));
-                dom.clearCompletedBtn.addEventListener('click', clearCompletedTasks);
-                
-                dom.startTimerBtn.addEventListener('click', startTimer);
-                dom.pauseTimerBtn.addEventListener('click', pauseTimer);
-                dom.resetTimerBtn.addEventListener('click', resetTimer);
-
-                dom.studyTimeInput.addEventListener('change', resetTimer);
-                dom.breakTimeInput.addEventListener('change', resetTimer);
+                updateDisplayFromInputs();
             }
 
-            initApp();
-
+            init();
         });
     </script>
 </body>
 </html>
+
