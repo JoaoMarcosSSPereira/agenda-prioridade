@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relógio de Foco</title>
+    <title>Relógio de Foco com Firestore</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Seção: Variáveis de Design e Estilos Globais */
         :root {
             --primary-color: #FFD700; /* Dourado */
             --primary-color-hover: #E5C100;
@@ -20,8 +19,6 @@
             --danger-color-hover: #E0553D;
             --success-color: #2ECC71;
         }
-
-        /* Seção: Estilos base e reset */
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--background-color);
@@ -34,7 +31,6 @@
             padding: 20px;
             box-sizing: border-box;
         }
-
         .container {
             background-color: var(--surface-color);
             border-radius: 12px;
@@ -46,7 +42,6 @@
             position: relative;
             overflow: hidden;
         }
-
         h1 {
             color: var(--primary-color);
             margin-top: 0;
@@ -54,12 +49,9 @@
             font-weight: 700;
             font-size: 2em;
         }
-
-        /* Seção: Estilos do Temporizador */
         .timer-section {
             margin-bottom: 30px;
         }
-
         #studyTopicInput {
             width: 100%;
             padding: 12px;
@@ -72,13 +64,11 @@
             box-sizing: border-box;
             text-align: center;
         }
-        
         #studyTopicInput:focus {
              border-color: var(--primary-color);
              outline: none;
              box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.4);
         }
-
         .time-inputs {
             display: flex;
             justify-content: center;
@@ -86,7 +76,6 @@
             margin-bottom: 20px;
             align-items: center;
         }
-
         .time-inputs input {
             width: 60px;
             padding: 10px;
@@ -97,12 +86,10 @@
             font-size: 1.2em;
             text-align: center;
         }
-        
         .time-inputs span {
             font-size: 1.2em;
             color: var(--primary-color);
         }
-
         #timerDisplay {
             font-size: 3.5em;
             font-weight: 700;
@@ -110,7 +97,6 @@
             margin-bottom: 20px;
             font-variant-numeric: tabular-nums;
         }
-
         .timer-controls button {
             padding: 12px 25px;
             border: none;
@@ -121,46 +107,37 @@
             transition: all 0.2s ease;
             margin: 0 5px;
         }
-
         #startPauseBtn {
             background-color: var(--primary-color);
             color: #1A1A1A;
         }
-
         #startPauseBtn:hover {
             background-color: var(--primary-color-hover);
             transform: translateY(-2px);
         }
-
         #stopBtn {
             background-color: var(--danger-color);
             color: var(--text-color);
         }
-
         #stopBtn:hover {
             background-color: var(--danger-color-hover);
             transform: translateY(-2px);
         }
-        
         #stopBtn:disabled {
             background-color: #555;
             cursor: not-allowed;
             transform: none;
         }
-
-        /* Seção: Estilos do Histórico */
         .history-section {
             border-top: 1px solid var(--border-color);
             padding-top: 20px;
             margin-top: 30px;
         }
-
         h2 {
             color: var(--text-color);
             font-size: 1.5em;
             margin-bottom: 20px;
         }
-
         #historyList {
             list-style: none;
             padding: 0;
@@ -169,7 +146,6 @@
             overflow-y: auto;
             text-align: left;
         }
-
         #historyList li {
             background-color: var(--background-color);
             border-radius: 8px;
@@ -180,28 +156,23 @@
             align-items: center;
             font-size: 1em;
         }
-        
         .session-info {
             flex-grow: 1;
             padding-right: 15px;
             word-break: break-word;
         }
-
         #historyList li .topic {
             font-weight: 600;
         }
-        
         #historyList li .duration {
             font-weight: 400;
             color: var(--primary-color);
             white-space: nowrap;
-            display: block; /* Garante que fique abaixo do tópico */
+            display: block;
             font-size: 0.9em;
             opacity: 0.8;
             margin-top: 4px;
         }
-        
-        /* NOVO: Estilo para o botão de deletar */
         .delete-btn {
             background: none;
             border: none;
@@ -214,25 +185,19 @@
             opacity: 0.3;
             transition: opacity 0.2s ease, color 0.2s ease;
         }
-
         #historyList li:hover .delete-btn {
-            opacity: 1; /* Mostra o botão ao passar o mouse no item da lista */
+            opacity: 1;
         }
-
         .delete-btn:hover {
             color: var(--danger-color);
         }
-        
-        /* Estilo para a barra de rolagem do histórico */
         #historyList::-webkit-scrollbar { width: 8px; }
         #historyList::-webkit-scrollbar-track { background: var(--surface-color); border-radius: 4px; }
         #historyList::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 4px; }
         #historyList::-webkit-scrollbar-thumb:hover { background-color: #555; }
-
-        /* Estilo para a notificação */
         #notification {
             position: absolute;
-            bottom: -50px; /* Começa fora da tela */
+            bottom: -50px;
             left: 50%;
             transform: translateX(-50%);
             background-color: var(--success-color);
@@ -244,19 +209,15 @@
             visibility: hidden;
             z-index: 10;
         }
-
         #notification.show {
             bottom: 20px;
             visibility: visible;
         }
-
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Relógio de Foco</h1>
-
-        <!-- Seção do Temporizador -->
         <div class="timer-section">
             <input type="text" id="studyTopicInput" placeholder="O que você vai estudar agora?">
             <div class="time-inputs">
@@ -270,19 +231,20 @@
                 <button id="stopBtn" disabled>Finalizar e Salvar</button>
             </div>
         </div>
-
-        <!-- Seção do Histórico -->
         <div class="history-section">
             <h2>Histórico de Estudos</h2>
-            <ul id="historyList">
-                <!-- Registros de estudo serão inseridos aqui -->
-            </ul>
+            <ul id="historyList"></ul>
         </div>
-
         <div id="notification"></div>
     </div>
 
-    <script>
+    <!-- MÓDULO: Inclusão e Configuração do Firebase -->
+    <script type="module">
+        // Importa as funções necessárias do SDK do Firebase que vamos usar
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
         document.addEventListener('DOMContentLoaded', () => {
             // Referências aos elementos do DOM
             const topicInput = document.getElementById('studyTopicInput');
@@ -299,41 +261,61 @@
             let totalDurationInSeconds = 0;
             let timeRemainingInSeconds = 0;
             let isRunning = false;
-            let studyHistory = [];
+            let userId = null; // Guardará o ID do usuário anônimo
+            
+            // Variáveis de configuração do Firebase (serão injetadas pelo ambiente)
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+            
+            // Instâncias dos serviços do Firebase
+            let app, auth, db;
 
             /**
-             * Formata o tempo de segundos para o formato MM:SS.
+             * Inicializa o Firebase e configura a autenticação e o listener do banco de dados.
              */
+            async function initializeFirebase() {
+                if (!firebaseConfig) {
+                    console.error("Configuração do Firebase não encontrada!");
+                    showNotification("Erro de conexão. Tente recarregar.");
+                    return;
+                }
+                
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        setupHistoryListener();
+                    } else {
+                        try {
+                            await signInAnonymously(auth);
+                        } catch (error) {
+                            console.error("Erro no login anônimo:", error);
+                            showNotification("Não foi possível conectar ao servidor.");
+                        }
+                    }
+                });
+            }
+
+            // Funções do Timer
             function formatTime(totalSeconds) {
                 const minutes = Math.floor(totalSeconds / 60);
                 const seconds = totalSeconds % 60;
                 return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
             }
-            
-            /**
-             * Formata o tempo de segundos para o formato HH:MM:SS para o histórico.
-             */
             function formatHistoryTime(totalSeconds) {
                 const hours = Math.floor(totalSeconds / 3600);
                 const minutes = Math.floor((totalSeconds % 3600) / 60);
                 const seconds = totalSeconds % 60;
                 return [hours, minutes, seconds].map(val => String(val).padStart(2, '0')).join(':');
             }
-
-            /**
-             * Mostra uma notificação na tela.
-             */
             function showNotification(message) {
                 notification.textContent = message;
                 notification.classList.add('show');
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 3000);
+                setTimeout(() => notification.classList.remove('show'), 3000);
             }
-
-            /**
-             * Atualiza o display do timer a cada segundo (contagem regressiva).
-             */
             function tick() {
                 timeRemainingInSeconds--;
                 timerDisplay.textContent = formatTime(timeRemainingInSeconds);
@@ -343,99 +325,104 @@
                     clearInterval(timerInterval);
                     document.title = "Relógio de Foco";
                     showNotification("Tempo esgotado! Sessão salva.");
-                    stopAndLogTimer(true); // O true indica que a sessão terminou naturalmente
+                    stopAndLogTimer(true);
                 }
             }
-
-            /**
-             * Inicia ou pausa o temporizador.
-             */
             function toggleTimer() {
                 if (isRunning) {
-                    // Pausa o timer
                     clearInterval(timerInterval);
                     isRunning = false;
                     startPauseBtn.textContent = 'Continuar';
                 } else {
-                    // Inicia ou continua o timer
-                    if (timeRemainingInSeconds === 0) { // Se está começando do zero
+                    if (timeRemainingInSeconds === 0) {
                         const minutes = parseInt(minutesInput.value) || 0;
                         const seconds = parseInt(secondsInput.value) || 0;
                         totalDurationInSeconds = (minutes * 60) + seconds;
                         timeRemainingInSeconds = totalDurationInSeconds;
                     }
-                    
                     if (timeRemainingInSeconds <= 0) {
                         showNotification('Por favor, defina um tempo de estudo.');
                         return;
                     }
-
-                    const topic = topicInput.value.trim();
-                    if (topic === '') {
+                    if (topicInput.value.trim() === '') {
                         showNotification('Defina um tópico de estudo antes de iniciar.');
                         return;
                     }
-                    
                     isRunning = true;
                     startPauseBtn.textContent = 'Pausar';
                     stopBtn.disabled = false;
-                    topicInput.disabled = true;
-                    minutesInput.disabled = true;
-                    secondsInput.disabled = true;
+                    [topicInput, minutesInput, secondsInput].forEach(el => el.disabled = true);
                     timerInterval = setInterval(tick, 1000);
                 }
             }
-            
-            /**
-             * Para o temporizador, salva a sessão e reseta o estado.
-             * @param {boolean} finishedNaturally - Indica se o timer chegou a zero.
-             */
-            function stopAndLogTimer(finishedNaturally = false) {
+            async function stopAndLogTimer(finishedNaturally = false) {
                 clearInterval(timerInterval);
                 isRunning = false;
-
                 const studiedSeconds = finishedNaturally ? totalDurationInSeconds : totalDurationInSeconds - timeRemainingInSeconds;
 
                 if (studiedSeconds > 0) {
-                    const session = {
-                        topic: topicInput.value.trim() || 'Sessão sem tópico',
-                        duration: formatHistoryTime(studiedSeconds),
-                        date: new Date().toISOString() // Usado como ID único
-                    };
-                    studyHistory.unshift(session);
-                    saveHistory();
-                    renderHistory();
+                    await saveSessionToFirestore(studiedSeconds);
                 }
 
-                // Reseta o estado
                 timeRemainingInSeconds = 0;
                 totalDurationInSeconds = 0;
-                updateDisplayFromInputs(); 
+                updateDisplayFromInputs();
                 startPauseBtn.textContent = 'Iniciar';
                 stopBtn.disabled = true;
                 topicInput.value = '';
-                topicInput.disabled = false;
-                minutesInput.disabled = false;
-                secondsInput.disabled = false;
+                [topicInput, minutesInput, secondsInput].forEach(el => el.disabled = false);
                 document.title = "Relógio de Foco";
             }
-            
-            /**
-            * Atualiza o timerDisplay com base nos valores dos inputs.
-            */
             function updateDisplayFromInputs() {
                 const minutes = parseInt(minutesInput.value) || 0;
                 const seconds = parseInt(secondsInput.value) || 0;
-                const totalSeconds = (minutes * 60) + seconds;
-                timerDisplay.textContent = formatTime(totalSeconds);
+                timerDisplay.textContent = formatTime((minutes * 60) + seconds);
+            }
+
+            /**
+             * Salva a sessão de estudo no Firestore.
+             */
+            async function saveSessionToFirestore(studiedSeconds) {
+                if (!userId) {
+                    showNotification("Erro: Usuário não autenticado.");
+                    return;
+                }
+                try {
+                    const collectionRef = collection(db, 'artifacts', appId, 'users', userId, 'studySessions');
+                    await addDoc(collectionRef, {
+                        topic: topicInput.value.trim() || 'Sessão sem tópico',
+                        durationInSeconds: studiedSeconds,
+                        createdAt: serverTimestamp()
+                    });
+                } catch (error) {
+                    console.error("Erro ao salvar sessão:", error);
+                    showNotification("Falha ao salvar a sessão.");
+                }
+            }
+            
+            /**
+             * Configura o listener em tempo real para o histórico do Firestore.
+             */
+            function setupHistoryListener() {
+                if (!userId) return;
+                const collectionRef = collection(db, 'artifacts', appId, 'users', userId, 'studySessions');
+                const q = query(collectionRef, orderBy('createdAt', 'desc'));
+
+                onSnapshot(q, (querySnapshot) => {
+                    const studyHistory = [];
+                    querySnapshot.forEach((doc) => {
+                        studyHistory.push({ id: doc.id, ...doc.data() });
+                    });
+                    renderHistory(studyHistory);
+                });
             }
 
             /**
              * Renderiza a lista de histórico na tela.
              */
-            function renderHistory() {
+            function renderHistory(studyHistory) {
                 historyList.innerHTML = '';
-                if (studyHistory.length === 0) {
+                if (!studyHistory || studyHistory.length === 0) {
                     const emptyMessage = document.createElement('li');
                     emptyMessage.textContent = 'Nenhuma sessão registrada.';
                     emptyMessage.style.textAlign = 'center';
@@ -445,44 +432,32 @@
                 }
                 studyHistory.forEach(session => {
                     const li = document.createElement('li');
-                    // NOVO: Adiciona o botão de deletar com um data-id único
                     li.innerHTML = `
                         <div class="session-info">
                             <span class="topic">${session.topic}</span>
-                            <span class="duration">${session.duration}</span>
+                            <span class="duration">${formatHistoryTime(session.durationInSeconds)}</span>
                         </div>
-                        <button class="delete-btn" data-id="${session.date}" title="Excluir registro">&times;</button>
+                        <button class="delete-btn" data-id="${session.id}" title="Excluir registro">&times;</button>
                     `;
                     historyList.appendChild(li);
                 });
             }
             
-            // NOVO: Função para deletar uma sessão do histórico
             /**
-             * Remove uma sessão do histórico com base no seu ID (data).
-             * @param {string} sessionId - O ID da sessão a ser removida.
+             * Remove uma sessão do Firestore.
              */
-            function deleteSession(sessionId) {
-                studyHistory = studyHistory.filter(session => session.date !== sessionId);
-                saveHistory();
-                renderHistory();
-                showNotification('Sessão removida do histórico.');
-            }
-
-            /**
-             * Salva o histórico no localStorage.
-             */
-            function saveHistory() {
-                localStorage.setItem('studyFocusHistory', JSON.stringify(studyHistory));
-            }
-
-            /**
-             * Carrega o histórico do localStorage ao iniciar.
-             */
-            function loadHistory() {
-                const storedHistory = localStorage.getItem('studyFocusHistory');
-                if (storedHistory) {
-                    studyHistory = JSON.parse(storedHistory);
+            async function deleteSessionFromFirestore(sessionId) {
+                if (!userId) {
+                    showNotification("Erro: Usuário não autenticado.");
+                    return;
+                }
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'users', userId, 'studySessions', sessionId);
+                    await deleteDoc(docRef);
+                    showNotification('Sessão removida do histórico.');
+                } catch (error) {
+                    console.error("Erro ao deletar sessão:", error);
+                    showNotification("Falha ao remover a sessão.");
                 }
             }
 
@@ -495,16 +470,14 @@
                 minutesInput.addEventListener('input', updateDisplayFromInputs);
                 secondsInput.addEventListener('input', updateDisplayFromInputs);
                 
-                // NOVO: Listener de eventos na lista para delegação do clique de deletar
                 historyList.addEventListener('click', (event) => {
                     if (event.target.classList.contains('delete-btn')) {
                         const sessionId = event.target.dataset.id;
-                        deleteSession(sessionId);
+                        deleteSessionFromFirestore(sessionId);
                     }
                 });
 
-                loadHistory();
-                renderHistory();
+                initializeFirebase();
                 updateDisplayFromInputs();
             }
 
