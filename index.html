@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relógio de Foco com Firestore</title>
+    <title>Relógio de Foco</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -238,13 +238,7 @@
         <div id="notification"></div>
     </div>
 
-    <!-- MÓDULO: Inclusão e Configuração do Firebase -->
-    <script type="module">
-        // Importa as funções necessárias do SDK do Firebase que vamos usar
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Referências aos elementos do DOM
             const topicInput = document.getElementById('studyTopicInput');
@@ -261,43 +255,7 @@
             let totalDurationInSeconds = 0;
             let timeRemainingInSeconds = 0;
             let isRunning = false;
-            let userId = null; // Guardará o ID do usuário anônimo
-            
-            // Variáveis de configuração do Firebase (serão injetadas pelo ambiente)
-            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-            
-            // Instâncias dos serviços do Firebase
-            let app, auth, db;
-
-            /**
-             * Inicializa o Firebase e configura a autenticação e o listener do banco de dados.
-             */
-            async function initializeFirebase() {
-                if (!firebaseConfig) {
-                    console.error("Configuração do Firebase não encontrada!");
-                    showNotification("Erro de conexão. Tente recarregar.");
-                    return;
-                }
-                
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        setupHistoryListener();
-                    } else {
-                        try {
-                            await signInAnonymously(auth);
-                        } catch (error) {
-                            console.error("Erro no login anônimo:", error);
-                            showNotification("Não foi possível conectar ao servidor.");
-                        }
-                    }
-                });
-            }
+            let studyHistory = []; // Array para guardar o histórico localmente
 
             // Funções do Timer
             function formatTime(totalSeconds) {
@@ -355,13 +313,20 @@
                     timerInterval = setInterval(tick, 1000);
                 }
             }
-            async function stopAndLogTimer(finishedNaturally = false) {
+            function stopAndLogTimer(finishedNaturally = false) {
                 clearInterval(timerInterval);
                 isRunning = false;
                 const studiedSeconds = finishedNaturally ? totalDurationInSeconds : totalDurationInSeconds - timeRemainingInSeconds;
 
                 if (studiedSeconds > 0) {
-                    await saveSessionToFirestore(studiedSeconds);
+                    const session = {
+                        topic: topicInput.value.trim() || 'Sessão sem tópico',
+                        durationInSeconds: studiedSeconds,
+                        id: Date.now().toString() // ID único para a sessão
+                    };
+                    studyHistory.unshift(session); // Adiciona no início do array
+                    saveHistory();
+                    renderHistory();
                 }
 
                 timeRemainingInSeconds = 0;
@@ -379,50 +344,21 @@
                 timerDisplay.textContent = formatTime((minutes * 60) + seconds);
             }
 
-            /**
-             * Salva a sessão de estudo no Firestore.
-             */
-            async function saveSessionToFirestore(studiedSeconds) {
-                if (!userId) {
-                    showNotification("Erro: Usuário não autenticado.");
-                    return;
-                }
-                try {
-                    const collectionRef = collection(db, 'artifacts', appId, 'users', userId, 'studySessions');
-                    await addDoc(collectionRef, {
-                        topic: topicInput.value.trim() || 'Sessão sem tópico',
-                        durationInSeconds: studiedSeconds,
-                        createdAt: serverTimestamp()
-                    });
-                } catch (error) {
-                    console.error("Erro ao salvar sessão:", error);
-                    showNotification("Falha ao salvar a sessão.");
+            // Funções de Persistência (localStorage)
+            function saveHistory() {
+                localStorage.setItem('studyFocusHistory', JSON.stringify(studyHistory));
+            }
+            function loadHistory() {
+                const storedHistory = localStorage.getItem('studyFocusHistory');
+                if (storedHistory) {
+                    studyHistory = JSON.parse(storedHistory);
                 }
             }
             
-            /**
-             * Configura o listener em tempo real para o histórico do Firestore.
-             */
-            function setupHistoryListener() {
-                if (!userId) return;
-                const collectionRef = collection(db, 'artifacts', appId, 'users', userId, 'studySessions');
-                const q = query(collectionRef, orderBy('createdAt', 'desc'));
-
-                onSnapshot(q, (querySnapshot) => {
-                    const studyHistory = [];
-                    querySnapshot.forEach((doc) => {
-                        studyHistory.push({ id: doc.id, ...doc.data() });
-                    });
-                    renderHistory(studyHistory);
-                });
-            }
-
-            /**
-             * Renderiza a lista de histórico na tela.
-             */
-            function renderHistory(studyHistory) {
+            // Funções de Renderização e Ação no Histórico
+            function renderHistory() {
                 historyList.innerHTML = '';
-                if (!studyHistory || studyHistory.length === 0) {
+                if (studyHistory.length === 0) {
                     const emptyMessage = document.createElement('li');
                     emptyMessage.textContent = 'Nenhuma sessão registrada.';
                     emptyMessage.style.textAlign = 'center';
@@ -442,28 +378,14 @@
                     historyList.appendChild(li);
                 });
             }
-            
-            /**
-             * Remove uma sessão do Firestore.
-             */
-            async function deleteSessionFromFirestore(sessionId) {
-                if (!userId) {
-                    showNotification("Erro: Usuário não autenticado.");
-                    return;
-                }
-                try {
-                    const docRef = doc(db, 'artifacts', appId, 'users', userId, 'studySessions', sessionId);
-                    await deleteDoc(docRef);
-                    showNotification('Sessão removida do histórico.');
-                } catch (error) {
-                    console.error("Erro ao deletar sessão:", error);
-                    showNotification("Falha ao remover a sessão.");
-                }
+            function deleteSession(sessionId) {
+                studyHistory = studyHistory.filter(session => session.id !== sessionId);
+                saveHistory();
+                renderHistory();
+                showNotification('Sessão removida do histórico.');
             }
 
-            /**
-             * Função de inicialização da aplicação.
-             */
+            // Função de Inicialização
             function init() {
                 startPauseBtn.addEventListener('click', toggleTimer);
                 stopBtn.addEventListener('click', () => stopAndLogTimer(false));
@@ -473,11 +395,12 @@
                 historyList.addEventListener('click', (event) => {
                     if (event.target.classList.contains('delete-btn')) {
                         const sessionId = event.target.dataset.id;
-                        deleteSessionFromFirestore(sessionId);
+                        deleteSession(sessionId);
                     }
                 });
 
-                initializeFirebase();
+                loadHistory();
+                renderHistory();
                 updateDisplayFromInputs();
             }
 
